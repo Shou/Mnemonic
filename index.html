@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<head>
+
+<title>Mnemonic</title>
+
+<link rel="stylesheet" type="text/css" href="style.css"></style>
+
+<script type="text/javascript">
+
+var fonts = [ "Courgette", "Condiment", "Lobster 1.3", "Sansita One"
+            , "Lobster Two", "Chunkfive", "Nautilus Pompilius", "Muli"
+            , "Bree Serif"
+            ]
+var font = 0
+
+// cycleFonts :: IO ()
+function cycleFonts() {
+    font++
+    var cfont = "\"" + fonts[font % fonts.length] + "\""
+    document.querySelector("header").style.fontFamily = cfont
+
+    console.log(cfont)
+}
+
+</script>
+
+</head>
+
+<body>
+
+<header>
+<span>
+Mnemonic
+</span>
+<ul>
+<li><a href="javascript:;">Sign up</a></li>
+<li><a href="javascript:;">Log in</a></li>
+</ul>
+</header>
+<main>
+
+<label for="upload">Upload file</label>
+<input type="file" name="files[]" id="upload" multiple>
+<!-- <button onclick="cycleFonts()">Change font</button> -->
+
+</main>
+
+<script type="text/javascript" src="script.js"></script>
+
+</body>
+
+</html>

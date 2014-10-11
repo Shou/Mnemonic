@@ -1,0 +1,99 @@
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:600,800,300);
+@import url(http://fonts.googleapis.com/css?family=Bree+Serif);
+
+*
+{ box-sizing: border-box
+}
+
+body
+{ font-family: "Helvetica Neue"
+; background-color: #f7f7f7
+; padding: 0
+; margin: 0
+; border: 0
+; display: flex
+; flex-direction: column
+}
+
+header
+{ display: flex
+; align-items: flex-end
+; justify-content: space-between
+; font-size: 9vw
+; font-family: "Bree Serif", serif
+; letter-spacing: 1vw
+; color: #f7f7f7
+; background-color: #133f3c
+; padding: 0.5em 0.5em 0 0.5em
+; border-bottom: 1vh solid #0c2725
+; text-shadow: 0.05em 0.05em 0.025em #103030
+; height: 20vh
+}
+
+header > ul
+{ display: flex
+; margin: 0
+; border-left: 0.2vh solid #062A28
+; border-right: 0.2vh solid #062A28
+; padding: 0
+}
+
+header > ul li
+{ list-style-type: none
+}
+
+header > ul li a
+{ display: block
+; font-size: 2vh
+; font-weight: 600
+; letter-spacing: 0
+; font-family: "Open Sans", sans-serif
+; background-color: #234E4B
+; padding: 3.3vh
+; margin-bottom: -0.9vh
+; border-bottom: 1vh solid #133F3C
+; border-top: 0.2vh solid #3B6C68
+}
+
+header > ul li a:focus, header > ul li a:hover
+{ background-color: #3B6C68
+; border-bottom: 1vh solid #234E4B
+}
+
+main
+{ margin: 0 auto
+; padding: 1em
+; display: flex
+; flex-direction: column
+; justify-content: center
+; align-items: center
+; height: 80vh
+}
+
+a
+{ color: #f7f7f7
+; text-decoration: none
+}
+
+input[type="file"]
+{ display: none
+}
+
+label
+{ font-family: "Open Sans", sans-serif
+; font-weight: 800
+; font-size: 4vh
+; color: #f7f7f7
+; padding: 0.6em
+; background-color: #45240A
+; border-radius: 0.1em
+; border-bottom: 0.2em solid #241000
+; cursor: pointer
+}
+
+label:focus, label:hover
+{ background-color: #805839
+; border-color: #673E1F
+}
+
