@@ -1,22 +1,41 @@
 
 <?php
 
-//header('Content-Type: text/plain; charset=utf-8')
+// 10 MiB
+$max_filesize = pow(1024, 2) * 10;
 
-//try {
+$db = new SQLite3("files.db");
 
-    $fs = $_FILES["files[]"]
+$db->exec("CREATE TABLE IF NOT EXISTS Files (filename varchar(255), filesha1 varchar(255), filetype varchar(255))");
 
-    echo $fs
+$tmps = $_FILES["files"]["tmp_name"];
+$sizes = $_FILES["files"]["size"];
+$names = $_FILES["files"]["name"];
 
-//    for ($i = 0; $i < $fs.length; $i++) {
-//        echo sha1_file($fs["tmp_name"])
-//    }
+$len = count($tmps);
 
-//} catch(RuntimeException $e) {
-//    echo $e->getMessage()
-//}
+for ($i = 0; $i < $len; $i++) {
+    if ($_FILES["files"]["size"][$i] > $max_filesize) {
+        echo $sizes[$i] . " > " . $max_filesize;
 
+        continue;
+    }
+
+    $exts = explode(".", $names[$i]);
+
+    $hash= sha1_file($tmps[$i]);
+
+    if (count($exts) > 1) {
+        $name = $hash. "." . implode(".", array_slice($exts, 1));
+
+    } else {
+        $name = $hash;
+    }
+
+    echo $name . "\n";
+
+    move_uploaded_file($tmps[$i], "up/" . $name) . "\n";
+}
 
 ?>
 

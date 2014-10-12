@@ -2,6 +2,51 @@
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:600,800,300);
 @import url(http://fonts.googleapis.com/css?family=Bree+Serif);
 
+@keyframes loadingbg {
+    0%
+    { background-color: #092B68
+    ; border-color: #051F50
+    }
+
+    60%
+    { background-color: #2A5095
+    ; border-color: #14397D
+    }
+
+    100%
+    { background-color: #092B68
+    ; border-color: #051F50
+    }
+}
+
+@keyframes errorshake {
+    33%
+    { background-color: #9C0800
+    ; border-color: #780600
+    ; transform: translateX(-25px)
+    }
+
+    66%
+    { transform: translateX(15px)
+    }
+
+    99%
+    { transform: translateX(-5px)
+    }
+}
+
+@keyframes successbg {
+    0%
+    { background-color: #23AE34
+    ; border-color: #0A921B
+    }
+
+    25%
+    { background-color: #23AE34
+    ; border-color: #0A921B
+    }
+}
+
 *
 { box-sizing: border-box
 }
@@ -95,5 +140,32 @@ label
 label:focus, label:hover
 { background-color: #805839
 ; border-color: #673E1F
+}
+
+details
+{ font-family: "Open Sans", sans-serif
+; font-weight: 300
+; font-size: 2vh
+; margin-top: 2em
+}
+
+.loading-background
+{ animation: loadingbg 1.5s infinite
+}
+
+.error-shake
+{ animation: errorshake 0.5s
+}
+
+.success-background
+{ animation: successbg 1s
+}
+
+.warning-color
+{ color: #9C4A00
+}
+
+.error-color
+{ color: #9C0800
 }
 
