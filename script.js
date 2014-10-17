@@ -26,6 +26,8 @@ function upload(e) {
 
     var formData = new FormData()
 
+    var total_filesize = 0
+
     for (var i = 0; i < files.length; i++) {
         console.log(files[i].size + " > " + max_file_size)
         if (files[i].size > max_file_size) {
@@ -33,7 +35,10 @@ function upload(e) {
             details.className += " error-color"
             details.textContent += "File \"" + files[i].name
                                  + "\" too large, please retry with a smaller "
-                                 + "file."
+                                 + "file.\n"
+        } else if (total_filesize > max_file_size)
+            details.textContent += "Sum of files too large, please retry with "
+                                 + "smaller files."
 
         } else
             formData.append("files[]", files[i], files[i].name)
