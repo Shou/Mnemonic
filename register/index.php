@@ -2,7 +2,7 @@
 <?php
 
 function opendb() {
-    $db = new PDO("sqlite:users.db");
+    $db = new PDO("sqlite:../users.db");
 
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
@@ -20,31 +20,36 @@ function parseArgs($post) {
 }
 
 function register($db, $nick, $pass) {
-    $query = $db->prepare("SELECT Nick FROM Users")
+    $query = $db->prepare("SELECT nick FROM Users");
 
     $query->execute();
 
     foreach ($query as $row) {
-        var_dump($row)
+        var_dump($row);
     }
 
     // TODO check if username is taken
     if (true) {
-        $input = $db->prepare("
+        $input = $db->prepare("INSERT INTO Users (nick, pass) VALUES (:nick, :pass)");
+
+        $input->execute(array("nick" => $nick, "pass" => $pass));
     }
 }
 
 function main() {
     $args = parseArgs($_POST);
 
+    $args = array("nick" => "Test", "pass" => "password");
+
     if ($args !== null) {
         $nick = $args["nick"];
         $pass = $args["pass"];
 
-        $db = getdb();
+        $db = opendb();
 
         register($db, $nick, $pass);
-    }
+
+    } else echo "ERROR LOL";
 }
 
 main();

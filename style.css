@@ -20,18 +20,27 @@
 }
 
 @keyframes errorshake {
-    33%
+    15%
     { background-color: #9C0800
     ; border-color: #780600
     ; transform: translateX(-25px)
     }
 
-    66%
-    { transform: translateX(15px)
+    30%
+    { background-color: #9C0800
+    ; border-color: #780600
+    ; transform: translateX(15px)
     }
 
-    99%
-    { transform: translateX(-5px)
+    45%
+    { background-color: #9C0800
+    ; border-color: #780600
+    ; transform: translateX(-5px)
+    }
+
+    60%
+    { background-color: #9C0800
+    ; border-color: #780600
     }
 }
 
@@ -45,6 +54,16 @@
     { background-color: #23AE34
     ; border-color: #0A921B
     }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0px #f7f7f7, 0 0 0 1px #b2dfdb, 0 0 0 4px #f7f7f7, 0 0 0 7px #b2dfdb }
+    100% { box-shadow: 0 0 0 3px #f7f7f7, 0 0 0 6px #b2dfdb, 0 0 0 9px #f7f7f7, 0 0 0 12px transparent }
+}
+
+@keyframes intropulse {
+    0% { box-shadow: 0 0 0 0px #f7f7f7, 0 0 0 1px #b2dfdb }
+    100% { box-shadow: 0 0 0 3px #f7f7f7, 0 0 0 6px #b2dfdb }
 }
 
 *
@@ -117,7 +136,7 @@ main
 }
 
 a
-{ color: #f7f7f7
+{ color: #03a9f4
 ; text-decoration: none
 }
 
@@ -140,6 +159,8 @@ label
 label:focus, label:hover
 { background-color: #805839
 ; border-color: #673E1F
+; transition: 1s background-color, 1s border-color
+; animation: intropulse 1s linear, pulse 2s linear 1s infinite
 }
 
 details
@@ -155,7 +176,7 @@ details
 }
 
 .error-shake
-{ animation: errorshake 0.5s
+{ animation: errorshake 1s
 }
 
 .success-background
@@ -168,5 +189,75 @@ details
 
 .error-color
 { color: #9C0800
+}
+
+#control
+{ width: 100%
+}
+
+#control > div
+{ font-size: 10pt
+; display: inline-block
+; cursor: pointer
+; background-color: #0277bd
+; color: #f7f7f7
+; font-weight: 600
+; padding: 1vh 1vw
+}
+
+#control > div:first-letter
+{ color: #fb8c00
+}
+
+#files
+{ display: table
+; width: 80vw
+; margin: 1vh 0
+; border: 1px solid #80cbc4
+; overflow: hidden
+; text-overflow: ellipsis
+}
+
+#files > div
+{ display: table-row
+; padding: 1vh 1vw
+}
+
+#files > div:nth-child(odd)
+{ background-color: #e1f5fe
+}
+
+#files > div:hover, #files > div:focus
+{ background-color: #b3e5fc
+}
+
+#files > div > *
+{ display: table-cell
+; vertical-align: middle
+}
+
+img.thumb
+{ max-width: 5vw
+; max-height: 5vh
+}
+
+#welcome
+{ font-size: 11pt
+; letter-spacing: 0
+; font-family: "Open Sans", sans-serif
+; font-weight: 600
+}
+
+nav
+{ font-weight: 300
+}
+
+#progress
+{ background-image: linear-gradient(90deg, #00bcd4 10%, #f7f7f7 11%)
+; color: #e65100
+; text-shadow: 1px 1px 1px #80deea
+; font-weight: bold
+; padding: 0.5vh 1vw
+; border: 1px solid #80deea
 }
 
