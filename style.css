@@ -118,7 +118,7 @@ Author: Benedict Aas (M00466699)
 }
 
 body
-{ font-family: "Gentium Basic", sans-serif
+{ font-family: "Open Sans", sans-serif
 ; background-color: #9ccc65
 ; background-position: center center
 ; padding: 0
@@ -228,7 +228,7 @@ label
 ; cursor: pointer
 }
 
-label:focus, label:hover
+label:hover
 { background-color: #00796b
 ; border-color: #673E1F
 ; transition: 1s background-color, 1s border-color
@@ -348,7 +348,7 @@ form
 }
 
 #control > div
-{ font-size: 10pt
+{ font-size: 1em
 ; display: inline-block
 ; cursor: pointer
 ; background-color: #0277bd
@@ -357,15 +357,11 @@ form
 ; padding: 1vh 1vw
 }
 
-#control > div:first-letter
-{ color: #fb8c00
-}
-
 #files
 { display: table
 ; width: 80vw
 ; margin: 1vh 0
-; border: 1px solid #80cbc4
+; border: 1px solid #888
 ; overflow: hidden
 ; text-overflow: ellipsis
 }
@@ -393,11 +389,32 @@ img.thumb
 ; max-height: 5vh
 }
 
-#welcome
-{ font-size: 11pt
-; letter-spacing: 0
+header > nav
+{ font-size: 1em
 ; font-family: "Open Sans", sans-serif
-; font-weight: 600
+; font-weight: 900
+; background-color: #424242
+; color: #f7f7f7
+; padding: 0.6em
+; margin: 1vw 1vw -0.25em 0
+; cursor: pointer
+}
+
+header > nav > div
+{ display: none
+; position: absolute
+; background-color: #424242
+; padding: 0.6em
+; margin: 0.6em 0 0 -0.6em
+}
+
+header > nav:hover > div
+{ display: flex
+; flex-direction: column
+}
+
+header > nav > div:hover
+{ background-color: #616161
 }
 
 nav
@@ -410,25 +427,7 @@ nav
 ; text-shadow: 1px 1px 1px #80deea
 ; font-weight: bold
 ; padding: 0.5vh 1vw
+; margin: 2vh 0 -1em
 ; border: 1px solid #80deea
-}
-
-div.floatwrap
-{ background-color: #fafafa
-; border: 1px solid #d0d0d0
-; border-radius: 1px
-; padding: 1vh 1vw
-; margin: 1vh 1vw
-; position: absolute
-; right: 0
-; top: 20vh
-}
-
-.floatwrap input
-{ display: block
-}
-
-.closebutton
-{ text-align: right
 }
 

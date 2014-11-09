@@ -7,8 +7,7 @@ var max_file_size = Math.pow(1024, 2) * 10
 
 var fileSelector = document.querySelector("#upload")
 var fileLabel = document.querySelector("[for='upload']")
-var login = document.querySelector("[name='auth'] > div > [type='button']")
-var register = document.querySelector("[name='auth'] > div > [type='submit']")
+var login = document.querySelector("[name='auth'] [type='button']")
 var form = document.querySelector("form[name='auth']")
 
 // }}}
@@ -91,6 +90,20 @@ Object.prototype.isEmpty = function() {
     return Object.keys(this).length === 0
 }
 
+// | Query selector going up the DOM instead
+// queryClimber :: Elem -> String -> Elem
+HTMLElement.prototype.queryClimber = function(s) {
+    var e = null
+    var c = this.parentNode
+
+    while ((! e) && c) {
+        c = c.parentNode
+        e = c.querySelector(s)
+    }
+
+    return e
+}
+
 // }}}
 
 // | Upload a file to the server.
@@ -112,9 +125,11 @@ function upload(e) {
         console.log(files[i].size + " > " + max_file_size)
         if (files[i].size > max_file_size) {
             tempClass(fileLabel, "error-shake", 500)
+
             console.log("File \"" + files[i].name
                                  + "\" too large, please retry with a smaller "
                                  + "file.\n")
+
         } else if (total_filesize > max_file_size) {
             details.textContent += "Sum of files too large, please retry with "
                                  + "smaller files."
@@ -167,22 +182,19 @@ function events() {
         var g = function(e) {
             e.preventDefault()
 
-            var form = this.parentNode.parentNode
-              , inps = form.querySelectorAll("input[name]")
+            // el hacky solution
+            var pare = this.queryClimber("form") || this
+              , inps = pare.querySelectorAll("input[name]")
               , args = collectParams(inps)
 
+            console.log(pare.children)
             console.log(args)
-            console.log("args.isEmpty? " + args.isEmpty())
+            console.log(args.isEmpty())
 
             if (! args.isEmpty()) {
-                submit(path, args, f)
+                submit(path, args, f) // XXX fix server-side
 
-                // XXX
-                alert( "Normally this should authenticate through XHR "
-                     + "but this is only the design; the front-end files.\n"
-                     + "If both inputs are empty, a redirect to the "
-                     + "associated authentication page occurs."
-                     )
+                window.location.href = "/files/" // XXX temporary
             }
 
             else
@@ -192,13 +204,15 @@ function events() {
         return g
     }
 
-    // TODO FIXME undefined placeholders for functions
+    // TODO FIXME XXX placeholders for functions begone
 
     // Login event
-    login.addEventListener("click", auth("/login/", alert))
+    if (window.location.pathname === "/")
+        login.addEventListener("click", auth("/login/", console.log))
 
     // Register event
-    form.addEventListener("submit", auth("/signup/", alert))
+    //if (["/", "/signup/", "/login/"].indexOf(window.location.pathname) !== -1)
+    form.addEventListener("submit", auth(form.action, console.log))
 }
 
 
