@@ -1,6 +1,16 @@
 
+/*
+
+Author: Benedict Aas (M00466699)
+
+*/
+
+/* Beautiful typography is important! */
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:600,800,300);
-@import url(http://fonts.googleapis.com/css?family=Bree+Serif);
+@import url(http://fonts.googleapis.com/css?family=Quando);
+@import url(http://fonts.googleapis.com/css?family=Gentium+Basic:400);
+
+/* {{{ Animations */
 
 @keyframes loadingbg {
     0%
@@ -57,8 +67,8 @@
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0px #f7f7f7, 0 0 0 1px #b2dfdb, 0 0 0 4px #f7f7f7, 0 0 0 7px #b2dfdb }
-    100% { box-shadow: 0 0 0 3px #f7f7f7, 0 0 0 6px #b2dfdb, 0 0 0 9px #f7f7f7, 0 0 0 12px transparent }
+    0% { box-shadow: 0 0 0 0px rgba(255,255,255,0.5), 0 0 0 1px #b2dfdb, 0 0 0 4px rgba(255,255,255,0.5), 0 0 0 7px #b2dfdb }
+    100% { box-shadow: 0 0 0 3px rgba(255,255,255,0.5), 0 0 0 6px #b2dfdb, 0 0 0 9px rgba(255,255,255,0.5), 0 0 0 12px transparent }
 }
 
 @keyframes intropulse {
@@ -66,73 +76,137 @@
     100% { box-shadow: 0 0 0 3px #f7f7f7, 0 0 0 6px #b2dfdb }
 }
 
+/* }}} */
+
+/* {{{ Media rules */
+
+/* Bigger fonts for compact screens */
+@media (max-height: 1100px) {
+    html, body
+    { font-size: 12pt
+    }
+}
+
+@media (min-height: 1100px) {
+    html, body
+    { font-size: 16pt
+    }
+}
+
+/* Background image accommodated to the screen */
+@media (orientation: portrait), (max-width: 1100px) {
+    body
+    { background-size: auto 100%
+    }
+
+    main, main > div
+    { width: 100%
+    }
+}
+
+@media (orientation: landscape) and (min-width: 1100px) {
+    body
+    { background-size: 100% auto
+    }
+}
+
+/* }}} */
+
+
 *
 { box-sizing: border-box
 }
 
 body
-{ font-family: "Helvetica Neue"
-; background-color: #f7f7f7
+{ font-family: "Gentium Basic", sans-serif
+; background-color: #9ccc65
+; background-position: center center
 ; padding: 0
 ; margin: 0
 ; border: 0
 ; display: flex
 ; flex-direction: column
+; min-height: 100vh
+; justify-content: space-between
+}
+
+body#front
+{ background-image: url(meadow.jpg)
 }
 
 header
 { display: flex
 ; align-items: flex-end
 ; justify-content: space-between
-; font-size: 9vw
-; font-family: "Bree Serif", serif
-; letter-spacing: 1vw
-; color: #f7f7f7
-; background-color: #133f3c
+; color: #424242
+; background-color: #f5f5f5
 ; padding: 0.5em 0.5em 0 0.5em
-; border-bottom: 1vh solid #0c2725
-; text-shadow: 0.05em 0.05em 0.025em #103030
-; height: 20vh
+; border-bottom: 0.3em solid #EEE
 }
 
-header > ul
-{ display: flex
-; margin: 0
-; border-left: 0.2vh solid #062A28
-; border-right: 0.2vh solid #062A28
-; padding: 0
+header span
+{ font-family: "Quando", serif
+; letter-spacing: 0.2em
 }
 
-header > ul li
-{ list-style-type: none
+h1, header span, form h1
+{ font-size: 2em
 }
 
-header > ul li a
+form, form input, label
+{ font-size: 1em
+}
+
+h1
+{ padding: 0.5em 0
+}
+
+h3
+{ margin: 1em auto 0.5em auto
+; text-transform: uppercase
+; margin: 1em 0 0 0
+}
+
+h3 > span
+{ font-family: "Gentium Basic", serif
+}
+
+h1 > span
 { display: block
-; font-size: 2vh
-; font-weight: 600
 ; letter-spacing: 0
-; font-family: "Open Sans", sans-serif
-; background-color: #234E4B
-; padding: 3.3vh
-; margin-bottom: -0.9vh
-; border-bottom: 1vh solid #133F3C
-; border-top: 0.2vh solid #3B6C68
-}
-
-header > ul li a:focus, header > ul li a:hover
-{ background-color: #3B6C68
-; border-bottom: 1vh solid #234E4B
+; font-size: 0.5em
 }
 
 main
-{ margin: 0 auto
-; padding: 1em
-; display: flex
+{ display: flex
 ; flex-direction: column
 ; justify-content: center
 ; align-items: center
-; height: 80vh
+; color: #f7f7f7
+; margin: 0 auto
+}
+
+main > div
+{ background-color: #f7f7f7
+; color: #212121
+; display: flex
+; flex-direction: column
+; align-items: center
+; padding: 1em
+; border-radius: 1px
+}
+
+footer
+{ font-family: "Open Sans", sans-serif
+; font-weight: 300
+; font-size: 0.8em
+; padding: 0.5em
+; color: #f7f7f7
+; text-align: right
+}
+
+footer span
+{ font-weight: 600
 }
 
 a
@@ -147,28 +221,106 @@ input[type="file"]
 label
 { font-family: "Open Sans", sans-serif
 ; font-weight: 800
-; font-size: 4vh
 ; color: #f7f7f7
 ; padding: 0.6em
-; background-color: #45240A
-; border-radius: 0.1em
-; border-bottom: 0.2em solid #241000
+; margin: 1vw 1vw -0.25em 0
+; background-color: #03a9f4
 ; cursor: pointer
 }
 
 label:focus, label:hover
-{ background-color: #805839
+{ background-color: #00796b
 ; border-color: #673E1F
 ; transition: 1s background-color, 1s border-color
 ; animation: intropulse 1s linear, pulse 2s linear 1s infinite
 }
 
-details
+form
+{ display: flex
+; flex-direction: column
+}
+
+form[name="auth"]
+{ width: 15em }
+
+form input
+{ margin: 0.25em
+; padding: 0.25em 0.5em
+; border: 1px solid #D0D0D0
+}
+
+form input[type="submit"], form input[type="button"]
+{ flex: 1 auto
+}
+
+form + article
+{ width: 20em
+}
+
+input[type="text"], input[type="password"]
+{ background-color: #F5F5F5
+}
+
+input[type="submit"], input[type="button"]
+{ font-family: "Open Sans", sans-serif
+; font-weight: 600
+; cursor: pointer
+}
+
+article
+{ background-color: #f7f7f7
+; color: #212121
+; font-family: "Gentium Basic", serif
+}
+
+article h3
+{ font-family: "Open Sans", sans-serif
+}
+
+article p
+{ text-align: left
+}
+
+p
+{ margin-top: 0
+}
+
+input[type="button"]
+{ background-color: #EEE
+}
+
+input[type="button"]:hover
+{ background-color: #F5F5F5
+}
+
+form input[type="submit"]
+{ background-color: #03a9f4
+; color: white
+; border-color: #00acc1
+}
+
+form input[type="submit"]:hover, form input[type="submit"]:focus
+{ background-color: #29b6f6
+}
+
+form div
+{ display: flex
+; align-items: center
+}
+
+form h1
 { font-family: "Open Sans", sans-serif
 ; font-weight: 300
-; font-size: 2vh
-; margin-top: 2em
-; white-space: pre-wrap
+; letter-spacing: 0.5vw
+; text-align: center
+; margin: 1vh 0 0 0
+}
+
+form
+{ font-family: "Open Sans", sans-serif
+; font-weight: 300
+; text-align: center
+; margin: 0 0 1vh 0
 }
 
 .loading-background
@@ -259,5 +411,24 @@ nav
 ; font-weight: bold
 ; padding: 0.5vh 1vw
 ; border: 1px solid #80deea
+}
+
+div.floatwrap
+{ background-color: #fafafa
+; border: 1px solid #d0d0d0
+; border-radius: 1px
+; padding: 1vh 1vw
+; margin: 1vh 1vw
+; position: absolute
+; right: 0
+; top: 20vh
+}
+
+.floatwrap input
+{ display: block
+}
+
+.closebutton
+{ text-align: right
 }
 
