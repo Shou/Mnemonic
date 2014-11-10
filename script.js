@@ -152,7 +152,7 @@ function upload(e) {
 
 // success :: String -> IO ()
 function success(rtxt) {
-    console.log("File uploaded.")
+    console.log(rtxt)
 
     fileLabel.classList.remove("loading-background")
 
@@ -161,12 +161,10 @@ function success(rtxt) {
 
 // failure :: IO ()
 function failure() {
-    console.log("File upload failure.")
+    console.log("File upload failure; server.")
 
     fileLabel.classList.remove("loading-background")
     tempClass(fileLabel, "error-shake", 1000)
-
-    details.textContent = "Server error."
 }
 
 // events :: IO ()
@@ -186,10 +184,6 @@ function events() {
             var pare = this.queryClimber("form") || this
               , inps = pare.querySelectorAll("input[name]")
               , args = collectParams(inps)
-
-            console.log(pare.children)
-            console.log(args)
-            console.log(args.isEmpty())
 
             if (! args.isEmpty()) {
                 submit(path, args, f) // XXX fix server-side

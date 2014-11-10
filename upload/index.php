@@ -5,10 +5,6 @@
 // - Logged-in upload
 //      - Cookies
 
-// | Maximum filesize as compared to the sum of all the files' sizes.
-// max_filesize :: Int
-$max_filesize = pow(1024, 2) * 10;
-
 function opendb() {
 // | Create or open "files.db" SQLite3 database.
     $db = new PDO("sqlite:../files.db");
@@ -34,8 +30,8 @@ function storeFiles($db) {
     for ($i = 0; $i < $len; $i++) {
         $total_filesize += $sizes[$i];
 
-        if ($total_filesize > $max_filesize) {
-            echo "File(s) too large.";
+        if ($total_filesize > pow(1024, 2) * 10) {
+            echo "File(s) too large.\n";
 
             break;
         }
@@ -51,9 +47,10 @@ function storeFiles($db) {
             $name = $hash;
         }
 
-        echo $name . "\n";
+        $moved = move_uploaded_file($tmps[$i], "../up/" . $name) . "\n";
 
-        move_uploaded_file($tmps[$i], "../up/" . $name) . "\n";
+        if ($moved) echo $name . "\n";
+        else echo "File move error.\n";
     }
 }
 
