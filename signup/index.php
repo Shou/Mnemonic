@@ -21,7 +21,7 @@ function opendb() {
 
 function parseArgs($post) {
     if ($post) {
-        if ($post["nick"] && $post["pass"]) {
+        if ($post["user"] && $post["pass"]) {
             return $post;
 
         } else return false;
@@ -61,7 +61,7 @@ function main() {
 
         register($db, $nick, $pass);
 
-    } else echo "ERROR LOL\n";
+    } else echo "1";
 }
 
 main();

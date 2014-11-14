@@ -117,20 +117,22 @@ function request(meth, url, args, succ, fail, headers) {
 var post = cu(request)("POST")
 var get = cu(request)("GET")
 
-// | Object to URL argument string
-// objToArgs :: Obj String String -> String
-function objToArgs(o) {
-    var args = ""
+// | Object to FormData
+// objToData :: Obj String String -> FormData
+function objToData(o) {
+    console.log(o) // XXX TEMPORARY
 
-    for (var k in o) arg += k + "=" + encodeURIComponent(o[k])
+    var fd = new FormData()
 
-    return args
+    for (var k in o) fd.append(k, encodeURIComponent(o[k]))
+
+    return fd
 }
 
 // | FUNCTIONAL PROGRAMMING FUNCTIONAL EVERYTHING FUNCTIONS FUNCTIONS FUNCTIONS
 // submit :: String -> Obj String String -> (XHR -> IO ()) -> IO ()
 function submit(url, o, f) {
-    post(url, objToArgs(o), f, abyss, {})
+    post(url, objToData(o), f, abyss, {})
 }
 
 // | Collect "value"s from elements in the list and return as object
@@ -238,7 +240,7 @@ function events() {
               , inps = pare.querySelectorAll("input[name]")
               , args = collectParams(inps)
 
-            if (! Object.keys(args).length === 0) {
+            if (! (Object.keys(args).length === 0)) {
                 submit(path, args, f)
 
                 //window.location.href = "/files/" // XXX temporary
@@ -246,8 +248,6 @@ function events() {
 
             else
                 window.location.href = path + "index.html"
-
-            return false
         }
     }
 
@@ -255,11 +255,11 @@ function events() {
 
     // Login event
     if (window.location.pathname === "/")
-        login.addEventListener("click", auth("/login/", console.log))
+        login.addEventListener("click", auth("/login/", trace))
 
     // Register event
     //if (["/", "/signup/", "/login/"].indexOf(window.location.pathname) !== -1)
-    form.addEventListener("submit", auth(form.action, console.log))
+    form.addEventListener("submit", auth(form.action, trace))
 }
 
 

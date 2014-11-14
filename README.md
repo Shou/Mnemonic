@@ -12,5 +12,5 @@ Middlesex University, by M00466699.
 * HTML5 compliant web browser
 * SQLite 3
 
-\*: I don't care about legacy browser support. Use an up-to-date browser.
+<sub>\*: I don't care about legacy browser support. Use an up-to-date browser.</sub>
 
