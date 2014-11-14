@@ -5,17 +5,26 @@
 // - Logged-in upload
 //      - Cookies
 
+// opendb :: IO PDO
 function opendb() {
-// | Create or open "files.db" SQLite3 database.
+    // Create or open "files.db" SQLite3 database.
     $db = new PDO("sqlite:../files.db");
 
-    $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    // Prepare statements in the SQL database.
+    //$db -> setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    // Raise hell, and exceptions.
+    //$db -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $create = $db->prepare("CREATE TABLE IF NOT EXISTS Files (filename varchar(255), filesha1 varchar(255), filetype varchar(255))");
+    $itable = "CREATE TABLE IF NOT EXISTS Files
+               (fname TEXT, fuser TEXT, fpath TEXT, fhash TEXT, ftype TEXT,
+                fsize INTEGER, fdate INTEGER);";
 
-    $create->execute();
+    $db -> exec($itable);
+
+    return $db;
 }
 
+// storeFiles :: PDO -> IO ()
 function storeFiles($db) {
     $tmps = $_FILES["files"]["tmp_name"];
     $sizes = $_FILES["files"]["size"];
@@ -36,23 +45,59 @@ function storeFiles($db) {
             break;
         }
 
-        $exts = explode(".", $names[$i]);
+        $name = $names[$i];
+
+        $user = null;
+
+        $path = null;
+
+        $exts = explode(".", $name);
+        $extn = "";
 
         $hash = sha1_file($tmps[$i]);
 
         if (count($exts) > 1) {
-            $name = $hash. "." . implode(".", array_slice($exts, 1));
+            $extn = implode(array_slice($exts, 1));
+            $filen = $hash . "." . $extn;
 
         } else {
-            $name = $hash;
+            $filen = $hash;
         }
 
-        $moved = move_uploaded_file($tmps[$i], "../up/" . $name) . "\n";
+        $time = time();
 
-        if ($moved) echo $name . "\n";
+        $size = $sizes[$i];
+
+        if (! file_exists("../up/" . $path . $filen))
+            $moved = move_uploaded_file($tmps[$i], "../up/" . $filen) . "\n";
+
+        if ($moved) echo $path . $filen . "\n";
         else echo "File move error.\n";
+
+        $iquery = "INSERT INTO Files (fname, fuser, fpath, fhash, ftype, fsize, fdate)
+                   VALUES (:fname, :fuser, :fpath, :fhash, :ftype, :fsize, :fdate);";
+        $stmt = $db -> prepare($iquery);
+        var_dump($stmt);
+        $sqlargs = array( "fname" => $name
+                        , "fuser" => $user
+                        , "fpath" => $path
+                        , "fhash" => $hash
+                        , "ftype" => $extn
+                        , "fsize" => $size
+                        , "fdate" => $time
+                        );
+        $res = $stmt -> execute($sqlargs);
+        var_dump($res);
+
+        $stmt = $db -> prepare("SELECT * FROM Files");
+        var_dump($stmt);
+        $res = $stmt -> execute();
+        var_dump($res);
+        $dat = $stmt -> fetchAll();
+        var_dump($dat);
     }
 }
+
 
 function main() {
     $db = opendb();

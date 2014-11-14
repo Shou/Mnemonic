@@ -20,6 +20,20 @@ var form = document.querySelector("form[name='auth']")
 
 // {{{ Utility functions
 
+// | Print a then return a
+// trace :: a -> a
+function trace(a) {
+    console.log(a)
+
+    return a
+}
+
+// id :: a -> a
+function id(a) { return a }
+
+// abyss :: a -> IO ()
+function abyss(_) {}
+
 // | Accumulate a result `z' from applying `f' to `z' and `xs[i]'.
 // foldr :: (a -> b -> b) -> b -> [a] -> b
 function foldr(f, z, xs) {
@@ -30,7 +44,7 @@ function foldr(f, z, xs) {
 // | foldr treating `z' as the first element in `xs' instead.
 function foldr1(f, xs){
     if (xs.length > 0) return foldr(f, head(xs), tail(xs))
-    else error("foldr1: empty list")
+    else console.error("foldr1: empty list")
 }
 
 // | Function composition, basically f(g(h(x))) = co(f, g, h)(x)
@@ -40,6 +54,34 @@ function co() {
     return foldr1(function(f, g) {
         return function(x) { return f(g(x)) }
     }, arguments)
+}
+
+// Curry helper function
+var _cur = function(f) {
+    var args = [].slice.call(arguments, 1)
+
+    return function() {
+        return f.apply(this, args.concat([].slice.call(arguments, 0)))
+    }
+}
+
+// | Currying, the best thing to pour over a dish of chicken and rice.
+// cu :: (a -> b -> n) -> (a -> (b -> n))
+var cu = function(f, len) {
+    var args = Array.slice.call(arguments, 1)
+      , len = len || f.length
+
+    return function() {
+        if (arguments.length < len) {
+            var comb = [f].concat([].slice.call(arguments, 0))
+
+            return len - arguments.length > 0
+                ? cu(_cur.apply(this, comb), len - arguments.length)
+                : _cur.call(this, comb)
+
+        } else
+            return f.apply(this, arguments)
+    }
 }
 
 // | Add a temporary className to an element, expires after `t' miliseconds.
@@ -52,27 +94,46 @@ function tempClass(e, c, t) {
     }, t)
 }
 
-// submit :: String -> Obj String String -> (String -> IO ()) -> IO ()
-function submit(url, args, f) {
+// | XHR request
+// request :: String -> String -> a -> (XHR -> IO ()) -> (XHR -> IO ()) -> IO ()
+function request(meth, url, args, succ, fail, headers) {
     var xhr = new XMLHttpRequest()
-      , arg = ""
 
-    xhr.open("POST", url, true)
+    xhr.open(meth, url, true)
 
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-    xhr.setRequestHeader("Connection", "close")
+    for (header in headers) xhr.setRequestHeader(header, headers[header])
 
     xhr.onload = function() {
-        if (xhr.status === 200) f(xhr.responseText)
-        else console.log("<submit> failed: " + xhr.status)
+        if (xhr.status === 200) succ(xhr)
+        else fail(xhr)
     }
 
-    for (var k in args) arg += k + "=" + encodeURIComponent(args[k])
+    console.log(args)
 
-    xhr.send(arg)
+    xhr.send(args)
 }
 
-// TODO skip on "", undefined or null.
+// | POST and GET requests
+var post = cu(request)("POST")
+var get = cu(request)("GET")
+
+// | Object to URL argument string
+// objToArgs :: Obj String String -> String
+function objToArgs(o) {
+    var args = ""
+
+    for (var k in o) arg += k + "=" + encodeURIComponent(o[k])
+
+    return args
+}
+
+// | FUNCTIONAL PROGRAMMING FUNCTIONAL EVERYTHING FUNCTIONS FUNCTIONS FUNCTIONS
+// submit :: String -> Obj String String -> (XHR -> IO ()) -> IO ()
+function submit(url, o, f) {
+    post(url, objToArgs(o), f, abyss, {})
+}
+
+// | Collect "value"s from elements in the list and return as object
 // collectParams :: [Elem] -> Obj String String
 function collectParams(inps) {
     var args = {}
@@ -82,12 +143,6 @@ function collectParams(inps) {
             args[inps[i].name] = inps[i].value
 
     return args
-}
-
-// this should be a default method
-// isEmpty :: Obj a b -> Bool
-Object.prototype.isEmpty = function() {
-    return Object.keys(this).length === 0
 }
 
 // | Query selector going up the DOM instead
@@ -131,36 +186,34 @@ function upload(e) {
                                  + "file.\n")
 
         } else if (total_filesize > max_file_size) {
-            details.textContent += "Sum of files too large, please retry with "
-                                 + "smaller files."
+            tempClass(fileLabel, "error-shake", 500)
+
+            console.log("File \"" + files[i].name
+                                  + "\" too large, please retry with a smaller "
+                                  + "file.\n")
 
         } else
             formData.append("files[]", files[i], files[i].name)
     }
 
-    var xhr = new XMLHttpRequest()
+    var headers = { "Content-Type": "application/x-www-form-urlencoded"
+                  , "Connection": "close"
+                  }
 
-    xhr.open("POST", "/upload/", true)
-
-    xhr.onload = function() {
-        if (xhr.status === 200) success(xhr.responseText)
-        else failure()
-    }
-
-    xhr.send(formData)
+    post("/upload/", formData, success, failure, headers)
 }
 
-// success :: String -> IO ()
-function success(rtxt) {
-    console.log(rtxt)
+// success :: XHR -> IO ()
+function success(xhr) {
+    console.log(xhr.responseText)
 
     fileLabel.classList.remove("loading-background")
 
     tempClass(fileLabel, "success-background", 1000)
 }
 
-// failure :: IO ()
-function failure() {
+// failure :: _ -> IO ()
+function failure(_) {
     console.log("File upload failure; server.")
 
     fileLabel.classList.remove("loading-background")
@@ -177,7 +230,7 @@ function events() {
     fileSelector.addEventListener("change", upload)
 
     var auth = function(path, f) {
-        var g = function(e) {
+        return function(e) {
             e.preventDefault()
 
             // el hacky solution
@@ -185,17 +238,17 @@ function events() {
               , inps = pare.querySelectorAll("input[name]")
               , args = collectParams(inps)
 
-            if (! args.isEmpty()) {
-                submit(path, args, f) // XXX fix server-side
+            if (! Object.keys(args).length === 0) {
+                submit(path, args, f)
 
-                window.location.href = "/files/" // XXX temporary
+                //window.location.href = "/files/" // XXX temporary
             }
 
             else
                 window.location.href = path + "index.html"
-        }
 
-        return g
+            return false
+        }
     }
 
     // TODO FIXME XXX placeholders for functions begone

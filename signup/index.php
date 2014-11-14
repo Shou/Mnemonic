@@ -1,47 +1,59 @@
 
 <?php
 
+// opendb :: IO PDO
 function opendb() {
     $db = new PDO("sqlite:../users.db");
 
-    $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    // Prepare statements in the SQL database.
+    //$db -> setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    // Raise hell, and exceptions.
+    //$db -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $create = $db->prepare("CREATE TABLE IF NOT EXISTS Users (nick varchar(255), pass varchar(255))");
+    // This table feels so naked
+    $itable = "CREATE TABLE IF NOT EXISTS Users
+               (fuser TEXT UNIQUE, fhash TEXT);";
 
-    $create->execute();
+    $db -> exec($itable);
+
+    return $db;
 }
 
 function parseArgs($post) {
     if ($post) {
         if ($post["nick"] && $post["pass"]) {
             return $post;
-        }
+
+        } else return false;
     }
 }
 
 function register($db, $nick, $pass) {
-    $query = $db->prepare("SELECT nick FROM Users");
+    // Well that was a lot simpler than I thought, I BET THE NSA CAN CRACK THIS
+    $hash = password_hash($pass, PASSWORD_DEFAULT);
 
-    $query->execute();
+    $query = $db->prepare("INSERT INTO Users (fuser, fhash)
+                           VALUES (:fuser, :fhash)");
 
-    foreach ($query as $row) {
-        var_dump($row);
-    }
+    $sqlargs = array( "fuser" => $nick
+                    , "fhash" => $hash
+                    );
 
-    // TODO check if username is taken
-    if (true) {
-        $input = $db->prepare("INSERT INTO Users (nick, pass) VALUES (:nick, :pass)");
+    $res = $query->execute($sqlargs);
+    var_dump($res);
 
-        $input->execute(array("nick" => $nick, "pass" => $pass));
-    }
+    $stmt = $db -> prepare("SELECT * FROM Users");
+    var_dump($stmt);
+    $res = $stmt -> execute();
+    var_dump($res);
+    $dat = $stmt -> fetchAll();
+    var_dump($dat);
 }
 
 function main() {
     $args = parseArgs($_POST);
 
-    $args = array("nick" => "Test", "pass" => "password");
-
-    if ($args !== null) {
+    if ($args) {
         $nick = $args["nick"];
         $pass = $args["pass"];
 
@@ -49,7 +61,7 @@ function main() {
 
         register($db, $nick, $pass);
 
-    } else echo "ERROR LOL";
+    } else echo "ERROR LOL\n";
 }
 
 main();
