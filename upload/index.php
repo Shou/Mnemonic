@@ -6,9 +6,9 @@
 //      - Cookies
 
 // opendb :: IO PDO
-function opendb() {
+function opendb($path) {
     // Create or open "files.db" SQLite3 database.
-    $db = new PDO("sqlite:../files.db");
+    $db = new PDO("sqlite:" . $path);
 
     // Prepare statements in the SQL database.
     //$db -> setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
@@ -100,7 +100,7 @@ function storeFiles($db) {
 
 
 function main() {
-    $db = opendb();
+    $db = opendb("../files.db");
 
     storeFiles($db);
 }

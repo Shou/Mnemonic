@@ -15,7 +15,7 @@
 
 <header>
 
-<span>Mnemonic</span>
+<a href="/files/">Mnemonic</a>
 
 <nav>
 Guest
@@ -63,6 +63,8 @@ function main() {
     $files = $sel -> fetchAll();
     //var_dump($files);
 
+    $totalSize = 0;
+
     for ($i = 0; $i < count($files); $i++) {
         $fname = $files[$i]["fname"];
         $fhash = $files[$i]["fhash"];
@@ -76,7 +78,11 @@ function main() {
                 <span class=size>$fsize</span>
                 <span class=date>$fdate</span>
               </div>";
+
+        $totalSize += $fsize;
     }
+
+    echo ceil($totalSize / pow(1024, 3) * 100) . "% of 1 GiB used.";
 }
 
 

@@ -68,7 +68,7 @@ var _cur = function(f) {
 // | Currying, the best thing to pour over a dish of chicken and rice.
 // cu :: (a -> b -> n) -> (a -> (b -> n))
 var cu = function(f, len) {
-    var args = Array.slice.call(arguments, 1)
+    var args = [].slice.call(arguments, 1)
       , len = len || f.length
 
     return function() {
@@ -198,11 +198,7 @@ function upload(e) {
             formData.append("files[]", files[i], files[i].name)
     }
 
-    var headers = { "Content-Type": "application/x-www-form-urlencoded"
-                  , "Connection": "close"
-                  }
-
-    post("/upload/", formData, success, failure, headers)
+    post("/upload/", formData, success, failure, {})
 }
 
 // success :: XHR -> IO ()

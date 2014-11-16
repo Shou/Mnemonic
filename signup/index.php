@@ -2,16 +2,12 @@
 <?php
 
 // opendb :: IO PDO
-function opendb() {
-    $db = new PDO("sqlite:../users.db");
+function opendb($path) {
+    $db = new PDO("sqlite:" . $path);
 
-    // Prepare statements in the SQL database.
-    //$db -> setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    // Raise hell, and exceptions.
-    //$db -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // This table feels so naked
-    $itable = "CREATE TABLE IF NOT EXISTS Users
+    $itable = "CREATE TABLE IF NOT EXISTS Logins
+               (fuser TEXT, fkey TEXT UNIQUE, fdate INT);
+               CREATE TABLE IF NOT EXISTS Users
                (fuser TEXT UNIQUE, fhash TEXT);";
 
     $db -> exec($itable);
@@ -19,47 +15,50 @@ function opendb() {
     return $db;
 }
 
+// parseArgs :: Obj String String -> Obj String String
 function parseArgs($post) {
     if ($post) {
         if ($post["user"] && $post["pass"]) {
             return $post;
 
-        } else return false;
+        } else return null;
     }
 }
 
-function register($db, $nick, $pass) {
-    // Well that was a lot simpler than I thought, I BET THE NSA CAN CRACK THIS
+// register :: PDO -> String -> String -> IO ()
+function register($db, $user, $pass) {
+    // Well that was a lot simpler than I thought I BET THE NSA CAN CRACK THIS
     $hash = password_hash($pass, PASSWORD_DEFAULT);
 
     $query = $db->prepare("INSERT INTO Users (fuser, fhash)
                            VALUES (:fuser, :fhash)");
 
-    $sqlargs = array( "fuser" => $nick
+    $sqlargs = array( "fuser" => $user
                     , "fhash" => $hash
                     );
 
-    $res = $query->execute($sqlargs);
-    var_dump($res);
+    $res = $query -> execute($sqlargs);
+
+    if (! $res) echo "That user already exists, please try again.\n";
 
     $stmt = $db -> prepare("SELECT * FROM Users");
-    var_dump($stmt);
     $res = $stmt -> execute();
     var_dump($res);
     $dat = $stmt -> fetchAll();
     var_dump($dat);
 }
 
+
 function main() {
     $args = parseArgs($_POST);
 
     if ($args) {
-        $nick = $args["nick"];
-        $pass = $args["pass"];
+        $db = opendb("../users.db");
 
-        $db = opendb();
+        if (strlen($args["pass"]) < 8)
+            echo "Please use 8 characters or more in your password.\n";
 
-        register($db, $nick, $pass);
+        else register($db, $args["user"], $args["pass"]);
 
     } else echo "1";
 }
