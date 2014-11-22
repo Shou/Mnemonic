@@ -1,3 +1,23 @@
+
+<?php
+
+require("server.php");
+
+function redirect($path) {
+    header("Location: " . $path, true, 302);
+    die();
+}
+
+function main() {
+    // XXX auth here
+
+    if (false) redirect("/files/");
+}
+
+main();
+
+?>
+
 <!DOCTYPE html>
 
 <head>

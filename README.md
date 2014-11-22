@@ -3,8 +3,7 @@ This is a bleeding edge\* Dropbox-esque service written as a task for csd2550 at
 Middlesex University, by M00466699.
 
 ## Featuring
-* Responsive design
-* Material design
+* Responsive and Material design
 * Single-instance storage
 
 ## Requirements

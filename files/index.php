@@ -1,3 +1,39 @@
+
+<?php
+
+require("../server.php");
+
+$fdb = opendb("../files.db", $fileTable);
+$adb = opendb("../users.db", $authTables);
+
+$files = userFiles($fdb, $adb);
+$fileDivs = [];
+
+$totalSize = 0;
+
+for ($i = 0; $i < count($files); $i++) {
+    $fname = $files[$i]["fname"];
+    $fhash = $files[$i]["fhash"];
+    $ftype = $files[$i]["ftype"];
+    $fsize = $files[$i]["fsize"];
+    $fdate = $files[$i]["fdate"];
+
+    array_push($fileDivs, "
+        <div class=file>
+            <span class=chck><input type=checkbox></span>
+            <img class=thumb src=/up/$fhash.$ftype>
+            <a href=/up/$fhash.$ftype>$fname</a>
+            <span class=size>$fsize</span>
+            <span class=date>$fdate</span>
+        </div>\n");
+
+    $totalSize += $fsize;
+}
+
+$total = ceil($totalSize / pow(1024, 3) * 100);
+
+?>
+
 <!DOCTYPE html>
 
 <head>
@@ -30,6 +66,8 @@ Guest
 
 <div>
 
+<div>
+
 <nav>
 
 Mnemonic
@@ -38,57 +76,36 @@ Mnemonic
 
 <div id=control>
 
-<div id=file>Files</div>
-<div id=dir>Folder</div>
-<div id=move>Rename</div>
-<div id=del>Delete</div>
+<input type="button" name="file" value="Files">
+<input type="button" name="dir" value="Folder">
+<input type="button" name="move" value="Rename">
+<input type="button" name="del" value="Delete">
 
 </div>
 
+<style type="text/css">
+#progress
+{ background-image: linear-gradient( 90deg, #00bcd4 <?php echo $total; ?>%
+                                   , #f7f7f7 <?php echo $total + 1; ?>%)
+}
+</style>
 <div id=progress>
-<div>10% of 1024 MB used</div>
+<?php echo $total . "%"; ?>
+</div>
+
 </div>
 
 <div id=files>
 
 <?php
 
-function main() {
-    $db = new PDO("sqlite:../files.db");
-    $isql = "SELECT * FROM Files";
-    $sel = $db -> prepare($isql);
-    //var_dump($sel);
-    $lel = $sel -> execute();
-    //var_dump($lel);
-    $files = $sel -> fetchAll();
-    //var_dump($files);
-
-    $totalSize = 0;
-
-    for ($i = 0; $i < count($files); $i++) {
-        $fname = $files[$i]["fname"];
-        $fhash = $files[$i]["fhash"];
-        $ftype = $files[$i]["ftype"];
-        $fsize = $files[$i]["fsize"];
-        $fdate = $files[$i]["fdate"];
-        echo "<div class=file>
-                <span class=chck><input type=checkbox></span>
-                <img class=thumb src=/up/$fhash.$ftype>
-                <a href=/up/$fhash.$ftype>$fname</a>
-                <span class=size>$fsize</span>
-                <span class=date>$fdate</span>
-              </div>";
-
-        $totalSize += $fsize;
-    }
-
-    echo ceil($totalSize / pow(1024, 3) * 100) . "% of 1 GiB used.";
+for ($i = 0; $i < count($fileDivs); $i++) {
+    echo $fileDivs[$i];
 }
 
-
-main();
-
 ?>
+
+</div>
 
 </div>
 
@@ -101,3 +118,4 @@ main();
 </body>
 
 </html>
+
