@@ -3,44 +3,20 @@
 
 require("server.php");
 
-function redirect($path) {
-    header("Location: " . $path, true, 302);
-    die();
-}
 
 function main() {
-    // XXX auth here
+    $adb = opendb("users.db", $authTables);
 
-    if (false) redirect("/files/");
+    $auth = cookieAuth($adb);
+
+    if ($auth) redirect("/files/");
 }
 
 main();
 
 ?>
 
-<!DOCTYPE html>
-
-<head>
-
-<title>Mnemonic</title>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="initial-scale=1, maximum-scale=1">
-
-<link rel="stylesheet" type="text/css" href="style.css">
-
-</head>
-
-<body id="front">
-
-<header>
-
-<a href="/">Mnemonic</a>
-
-<label for="upload">Upload</label>
-<input type="file" name="files[]" id="upload" multiple>
-
-</header>
+<?php require("top.html"); ?>
 
 <main>
 
@@ -60,11 +36,5 @@ main();
 
 </main>
 
-<footer>Design by <span>Benedict Aas</span></footer>
-
-<script type="text/javascript" src="/script.js"></script>
-
-</body>
-
-</html>
+<?php require("bottom.html"); ?>
 

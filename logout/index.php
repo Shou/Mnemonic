@@ -3,18 +3,12 @@
 
 require("../server.php");
 
-
 function poster() {
-    $db = opendb("../users.db", $authTables);
+    $adb = opendb("../users.db", $authTables);
 
-    $args = authArgs($_POST);
+    logout($adb, $_COOKIE["pass"]);
 
-    if ($args) {
-        $code = login($db, $args["user"], $args["pass"]);
-
-        echo $code;
-
-    } else echo 1;
+    redirect("/");
 
     exit();
 }
@@ -24,7 +18,7 @@ function geter() {
 
     $auth = cookieAuth($adb);
 
-    if ($auth) redirect("/files/");
+    if (! $auth) redirect("/");
 }
 
 function main() {
@@ -41,7 +35,7 @@ main();
 
 <head>
 
-<title>Log in &#x25AA; Mnemonic</title>
+<title>Sign up &#x25AA; Mnemonic</title>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="initial-scale=1, maximum-scale=1">
@@ -65,15 +59,14 @@ main();
 
 <div>
 
-<form name="auth" method="post" action="/login/">
+<form name="auth" method="post" action="/logout/">
 
-<h1>Sign in</h1>
-<input type="text" name="user" placeholder="Username" required>
-<input type="password" name="pass" placeholder="Password" required>
-<input type="submit" value="Log in">
+<h1>Sign out
+<span>are you sure?</span>
+</h1>
+<input type="submit" value="Sign out">
 
 </form>
-
 
 </div>
 

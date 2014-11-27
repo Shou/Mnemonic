@@ -243,10 +243,11 @@ form
 form[name="auth"]
 { width: 15em }
 
-form input
+input
 { margin: 0.25em
 ; padding: 0.25em 0.5em
-; border: 1px solid #D0D0D0
+; border-width: 1px
+; border-style: solid
 }
 
 form input[type="submit"], form input[type="button"]
@@ -287,6 +288,7 @@ p
 
 input[type="button"]
 { background-color: #EEE
+; border-color: #E0E0E0
 }
 
 input[type="button"]:hover

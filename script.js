@@ -9,6 +9,7 @@ var fileSelector = document.querySelector("#upload")
 var fileLabel = document.querySelector("[for='upload']")
 var login = document.querySelector("[name='auth'] [type='button']")
 var form = document.querySelector("form[name='auth']")
+var logouts = document.querySelectorAll("a[href].logout")
 
 // }}}
 
@@ -95,7 +96,8 @@ function tempClass(e, c, t) {
 }
 
 // | XHR request
-// request :: String -> String -> a -> (XHR -> IO ()) -> (XHR -> IO ()) -> IO ()
+// request :: String -> String -> a -> (XHR -> IO ()) -> (XHR -> IO ())
+//         -> Obj String String -> IO ()
 function request(meth, url, args, succ, fail, headers) {
     var xhr = new XMLHttpRequest()
 
@@ -161,6 +163,10 @@ HTMLElement.prototype.queryClimber = function(s) {
     return e
 }
 
+// | Redirect to another page
+// redirect :: Path -> IO ()
+function redirect(p) { window.location.href = p }
+
 // }}}
 
 // | Upload a file to the server.
@@ -218,6 +224,16 @@ function failure(_) {
     tempClass(fileLabel, "error-shake", 1000)
 }
 
+// handleForm :: XHR -> IO ()
+function handleForm(xhr) {
+    console.log(xhr)
+}
+
+// logout :: IO ()
+function logout() {
+    post("/logout/", null, abyss, abyss, {})
+}
+
 // events :: IO ()
 function events() {
     // File selector event
@@ -236,26 +252,25 @@ function events() {
               , inps = pare.querySelectorAll("input[name]")
               , args = collectParams(inps)
 
-            if (! (Object.keys(args).length === 0)) {
+            if (! (Object.keys(args).length === 0) || inps.length === 0) {
                 submit(path, args, f)
 
-                //window.location.href = "/files/" // XXX temporary
-            }
-
-            else
-                window.location.href = path + "index.html"
+            } else
+                window.location.href = path
         }
     }
 
-    // TODO FIXME XXX placeholders for functions begone
-
     // Login event
     if (window.location.pathname === "/")
-        login.addEventListener("click", auth("/login/", trace))
+        login.addEventListener("click", auth("/login/", handleForm))
 
     // Register event
-    //if (["/", "/signup/", "/login/"].indexOf(window.location.pathname) !== -1)
-    form.addEventListener("submit", auth(form.action, trace))
+    form.addEventListener("submit", auth(form.action, handleForm))
+
+    console.log(logouts)
+    // Logout events
+    for (var i = 0; i < logouts.length; i++)
+        logouts[i].addEventListener("click", logout)
 }
 
 
