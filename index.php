@@ -25,8 +25,8 @@ main();
 <h1>Sign up
 <span>or log in</span>
 </h1>
-<input type="text" name="user" placeholder="Username">
-<input type="password" name="pass" placeholder="Password">
+<input type="text" name="user" placeholder="Username" required>
+<input type="password" name="pass" placeholder="Password" required>
 <div>
     <input type="submit" value="Sign up">
     <input type="button" value="Log in">

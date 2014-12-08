@@ -16,15 +16,19 @@
 // {{{ Consts
 
 $fileTable = "CREATE TABLE IF NOT EXISTS Files
-              (fname TEXT, fuser TEXT, fpath TEXT, fhash TEXT, ftype TEXT,
-               fsize INTEGER, fdate INTEGER);
+              ( fname TEXT, fuser TEXT, fpath TEXT, fhash TEXT, ftype TEXT
+              , fsize INTEGER, fdate INTEGER
+              , UNIQUE (fname, fuser)
+              );
               CREATE TABLE IF NOT EXISTS Paths
-              (fpath TEXT, fuser TEXT, fsize INTEGER, fdate INTEGER);";
+              ( fpath TEXT, fuser TEXT, fsize INTEGER, fdate INTEGER
+              , UNIQUE (fpath, fuser)
+              );";
 
 $authTables = "CREATE TABLE IF NOT EXISTS Logins
-              (fuser TEXT, fkey TEXT UNIQUE, fdate INTEGER);
-              CREATE TABLE IF NOT EXISTS Users
-              (fuser TEXT UNIQUE, fhash TEXT);";
+               (fuser TEXT, fkey TEXT UNIQUE, fdate INTEGER);
+               CREATE TABLE IF NOT EXISTS Users
+               (fuser TEXT UNIQUE, fhash TEXT);";
 
 // }}}
 
@@ -121,7 +125,7 @@ function storeFiles($fdb, $adb) {
 
     $user = cookieAuth($adb)["fuser"];
 
-    $path = null;
+    $path = $_POST["path"];
 
     // Check the total filesize, get file extension, generate SHA1 for file,
     // move file to "up" folder.
@@ -143,7 +147,7 @@ function storeFiles($fdb, $adb) {
 
         if (count($exts) > 1) {
             $extn = implode(array_slice($exts, 1));
-            $filen = $hash . "." . $extn;
+            $filen = $hash;
 
         } else {
             $filen = $hash;
@@ -245,11 +249,8 @@ function register($db, $user, $pass) {
     login($db, $user, $pass);
 }
 
-// XXX pass username instead of another PDO?
-// selectFile :: String -> PDO -> PDO -> IO (Object String String)
-function selectFile($ft, $fdb, $adb) {
-    $user = cookieAuth($adb)["fuser"];
-
+// selectFile :: String -> PDO -> PDO -> IO [Object String String]
+function selectFile($ft, $fdb, $user) {
     $isql = "SELECT * FROM $ft
              WHERE fuser=:fuser";
     $sel = $fdb -> prepare($isql);
@@ -262,18 +263,17 @@ function selectFile($ft, $fdb, $adb) {
 
 // logout :: PDO -> String -> IO ()
 function logout($adb, $hash) {
-    $query = $adb -> prepare("DELETE FROM Users
-                              WHERE fhash=:fhash");
+    $query = $adb -> prepare("DELETE FROM Logins
+                              WHERE fkey=:fkey");
+
+    $sqlargs = array( "fkey" => $_COOKIE["pass"] );
+
+    $res = $query -> execute($sqlargs);
 
     setcookie("pass", null, time() - 3600, "/", "", false, true);
     unset($_COOKIE["pass"]);
 
-    $sqlargs = array( "fhash" => $hash
-                    );
-
-    $res = $query -> execute($sqlargs);
-
-    if (! $res) echo "Hash doesn't exist.\n";
+    if (! $res) echo "Key doesn't exist.\n";
 }
 
 ?>

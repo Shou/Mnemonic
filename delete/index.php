@@ -4,20 +4,46 @@
 require("../server.php");
 
 
+// TODO unlink file if not used anywhere else in DB
+// TODO move to server.php as `deleteFile'
+// FIXME if file doesn't exist, should not return 0
 function poster($auth) {
-    $args = safeArgs($_POST, ["file"]);
+    $fargs = safeArgs($_POST, ["file"]);
+    $pargs = safeArgs($_POST, ["path"]);
 
-    if ($args) {
+    if (!$fargs && !$pargs) echo 1;
+
+    else {
         $db = opendb("../files.db", $fileTable);
 
-        
+        if ($fargs) {
+            $stab = "Files";
+            $cnam = "fhash";
+            $file = $fargs["file"];
 
-    } else echo "1";
+        } else if ($pargs) {
+            $stab = "Paths";
+            $cnam = "fpath";
+            $file = $pargs["path"];
+        }
+
+        $isql = "DELETE FROM $stab WHERE fuser=:fuser AND $cnam=:fname";
+        $sqlargs = array( "fuser" => $auth["fuser"]
+                        , "fname" => $file
+                        );
+
+        $sel = $db -> prepare($isql);
+        $exe = $sel -> execute($sqlargs);
+
+        var_dump($exe);
+        if ($exe) echo 0;
+    }
 
     exit();
 }
 
 function geter() {
+    exit();
 }
 
 function main() {

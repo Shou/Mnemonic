@@ -8,10 +8,10 @@ $adb = opendb("../users.db", $authTables);
 
 $nick = cookieAuth($adb)["fuser"];
 
-$paths = selectFile("Paths", $fdb, $adb);
+$paths = selectFile("Paths", $fdb, $nick);
 $pathDivs = [];
 
-$files = selectFile("Files", $fdb, $adb);
+$files = selectFile("Files", $fdb, $nick);
 $fileDivs = [];
 
 $totalSize = 0;
@@ -22,9 +22,9 @@ for ($i = 0; $i < count($paths); $i++) {
     $fdate = $paths[$i]["fdate"];
 
     array_push($pathDivs, "
-        <div class=file>
+        <div class=fldr>
             <span class=chck><input type=checkbox></span>
-            <img class=thumb src=/icons/folder.png>
+            <img class=thmb src=/icons/folder.png>
             <a href=/files/#$fpath>$fpath</a>
             <span class=size>$fsize</span>
             <span class=date>$fdate</span>
@@ -41,8 +41,8 @@ for ($i = 0; $i < count($files); $i++) {
     array_push($fileDivs, "
         <div class=file>
             <span class=chck><input type=checkbox></span>
-            <img class=thumb src=/up/$fhash.$ftype>
-            <a href=/up/$fhash.$ftype>$fname</a>
+            <img class=thmb src=/up/$fhash>
+            <a href=/up/$fhash download=\"$fname\">$fname</a>
             <span class=size>$fsize</span>
             <span class=date>$fdate</span>
         </div>\n");
@@ -70,17 +70,16 @@ Mnemonic
 
 <div id=control>
 
-<input type="button" name="file" value="Files">
-<input type="button" name="dir" value="Folder">
+<input type="button" name="path" value="New folder">
 <input type="button" name="move" value="Rename">
-<input type="button" name="del" value="Delete">
+<input type="button" name="delete" value="Delete">
 
 </div>
 
 <style type="text/css">
 #progress
 { background-image: linear-gradient( 90deg, #00bcd4 <?php echo $total; ?>%
-                                   , #f7f7f7 <?php echo $total + 1; ?>%)
+                                   , #2d2d2d <?php echo $total + 1; ?>%)
 }
 </style>
 <div id=progress>

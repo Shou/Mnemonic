@@ -361,20 +361,19 @@ form
 
 #files
 { display: table
-; width: 80vw
+; width: 100%
 ; margin: 1vh 0
-; border: 1px solid #888
 ; overflow: hidden
 ; text-overflow: ellipsis
 }
 
 #files > div
 { display: table-row
-; padding: 1vh 1vw
+; height: 5em
 }
 
 #files > div:nth-child(odd)
-{ background-color: #e1f5fe
+{ background-color: #f1f5fe
 }
 
 #files > div:hover, #files > div:focus
@@ -384,11 +383,12 @@ form
 #files > div > *
 { display: table-cell
 ; vertical-align: middle
+; margin: 1em
 }
 
-img.thumb
-{ max-width: 5vw
-; max-height: 5vh
+img.thmb
+{ max-width: 3em
+; max-height: 3em
 }
 
 header > nav
@@ -424,8 +424,8 @@ nav
 }
 
 #progress
-{ color: #e65100
-; text-shadow: 1px 1px 1px #80deea
+{ color: #f0f0f0
+; text-shadow: 1px 1px 1px #3d3d3d
 ; font-weight: bold
 ; padding: 0.5vh 1vw
 ; margin: 2vh 1vh
