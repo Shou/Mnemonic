@@ -8,28 +8,30 @@ require("../server.php");
 // TODO move to server.php as `deleteFile'
 // FIXME if file doesn't exist, should not return 0
 function poster($auth) {
-    $fargs = safeArgs($_POST, ["file"]);
-    $pargs = safeArgs($_POST, ["path"]);
+    $args = safeArgs($_POST, ["n", "p"]);
 
-    if (!$fargs && !$pargs) echo 1;
+    if (!$args) echo 1;
 
     else {
         $db = opendb("../files.db", $fileTable);
 
-        if ($fargs) {
+        if ($args["t"]) {
+            $stab = "Paths";
+            $cnam = "fname";
+
+        } else {
             $stab = "Files";
             $cnam = "fhash";
-            $file = $fargs["file"];
-
-        } else if ($pargs) {
-            $stab = "Paths";
-            $cnam = "fpath";
-            $file = $pargs["path"];
         }
 
-        $isql = "DELETE FROM $stab WHERE fuser=:fuser AND $cnam=:fname";
+        $file = $args["n"];
+        $path = $args["p"];
+
+        $isql = "DELETE FROM $stab
+                 WHERE fuser=:fuser AND $cnam=:fname AND fpath=:fpath";
         $sqlargs = array( "fuser" => $auth["fuser"]
                         , "fname" => $file
+                        , "fpath" => $path
                         );
 
         $sel = $db -> prepare($isql);

@@ -56,6 +56,9 @@ var fcbutts = function() {
 
 // State is evil, etc
 
+// path :: String
+var path = decodeURIComponent(window.location.search.replace(/\?path=\/?/, ""))
+
 // }}}
 
 // {{{ Utility functions
@@ -131,6 +134,23 @@ function fmap(f, fntor) {
     else return null
 }
 
+// | STRAIGHT FROM HASKELL BASE BABY
+// maybe :: a -> (a -> b) -> Maybe a -> b
+function maybe(a, f, m) {
+    if (m) return f(m)
+    else return a
+}
+
+// | functional IF STATEMENTS hhaHAhAHHAHFAJSHFLJ
+// iff :: Bool -> a -> a -> a
+function iff(b, x, y) { return b ? x : y }
+
+// add :: a -> a -> a
+var add = cu(function(x, y) { return x + y })
+
+// flip :: (a -> b -> c) -> b -> a -> c
+var flip = cu(function(f, a, b) { return f(b, a) })
+
 // addEventListener :: String -> (Event -> IO ()) -> Elem -> IO ()
 var addEventListener = cu(function(etype, f, elem) {
     HTMLElement.prototype.addEventListener(elem, etype, f)
@@ -177,7 +197,7 @@ function objToData(o) {
 
     var fd = new FormData()
 
-    for (var k in o) fd.append(k, encodeURIComponent(o[k]))
+    for (var k in o) if (o[k]) fd.append(k, o[k])
 
     return fd
 }
@@ -256,8 +276,6 @@ function upload(e) {
 
     var total_filesize = 0
 
-    var path = location.hash.replace(/^#/, "")
-
     formData.append("path", path)
 
     for (var i = 0; i < files.length; i++) {
@@ -312,11 +330,69 @@ function logout() {
     post("/logout/", null, abyss, abyss, {})
 }
 
-function pathMove(e) {
+// deleteFile :: Object String String -> IO ()
+function deleteFile(o) {
+    var o = { t: o.type, n: o.hash, p: o.path }
+    submit("/delete/", o, function(x){ console.log(x) })
 }
 
+// moveFile :: Object String String -> IO ()
+function moveFile(o) {
+    var o = { n: o.hash, nf: o.newname, p: o.path, t: o.type }
+    submit("/move/", o, function(x){ console.log(x) })
+}
+
+// makePath :: Object String String -> IO ()
+function makePath(o) {
+    var o = { n: o.name, p: o.path }
+    submit("/make/", o, function(x){ console.log(x) })
+}
+
+// fileButt :: Event -> IO ()
 function fileButt(e) {
-    return fileActions[this.name]
+    console.log(this.name)
+    var o = ({ "delete": { fun: deleteFile
+                         , title: "Confirm deletion"
+                         , disabled: true
+                         }
+             , "rename": { fun: moveFile
+                         , title: "Rename file"
+                         }
+             , "move": { fun: moveFile
+                       , title: "Move file"
+                       , placeholder: maybe("/", id, path)
+                       }
+             , "path": { fun: makePath
+                       , title: "Create new folder"
+                       , dynamic: true
+                       }
+             })[this.name]
+
+      , sels = document.querySelectorAll("#files > div")
+      , files = []
+
+    for (var i = 0; i < sels.length; i++) {
+        var chkd = sels[i].querySelector("[type='checkbox']").checked
+          , hash = sels[i].querySelector("a").pathname.replace("/up/", "")
+          , name = sels[i].querySelector("a").textContent
+          , isPath = sels[i].className === "fldr"
+
+        if (chkd) {
+            files.push({ type: isPath
+                       , hash: hash
+                       , name: name
+                       , path: maybe("/", id, path)
+                       })
+        }
+    }
+
+    fancyPrompt(files, o)
+}
+
+// pathTravel :: Event -> IO ()
+function pathTravel(e) {
+    window.location.search =
+        "path=" + maybe("", flip(add, '/'), path) + this.textContent
 }
 
 // events :: IO ()
@@ -346,35 +422,52 @@ function events() {
         }
     }
 
-    // Login event
-    if (window.location.pathname === "/")
+    // Home-page events
+    if (window.location.pathname === "/") {
+
+        // Login event
         login().addEventListener("click", auth("/login/", handleForm))
 
-    // Form submit events
-    for (var i = 0; i < forms().length; i++)
-        forms()[i].addEventListener("submit", auth(forms()[i].action, handleForm))
+    // File-browser events
+    } else if (window.location.pathname === "/files/") {
 
-    // Logout events
-    for (var i = 0; i < logouts().length; i++)
-        logouts()[i].addEventListener("click", logout)
+        // Logout events
+        for (var i = 0; i < logouts().length; i++)
+            logouts()[i].addEventListener("click", logout)
 
-    if (location.pathname === "/files/") {
+        // Paths events
         for (var i = 0; i < paths().length; i++)
-            paths()[i].addEventListener("click", pathMove)
+            paths()[i].children[2].addEventListener("click", pathTravel)
 
+        // Files events
         for (var i = 0; i < fcbutts().length; i++)
             fcbutts()[i].addEventListener("click", fileButt)
+
+    // Non-file-browser events
+    } else if (window.location.pathname !== "/files/") {
+
+        // Form submit events
+        for (var i = 0; i < forms().length; i++)
+            forms()[i].addEventListener( "submit"
+                                       , auth(forms()[i].action, handleForm)
+                                       )
     }
 }
 
 // | i'm sorry i wrote this monster
-// units :: IO ()
-function units() {
-    for (var i = 0; i < files().length; i++) {
-        var esize = files()[i].querySelector(".size")
-        var edate = files()[i].querySelector(".date")
+// fixUnits :: IO ()
+function fixUnits() {
+    var es = [].slice.call(paths()).concat([].slice.call(files()))
 
-        esize.textContent = fileUnit(esize.textContent)
+    for (var i = 0; i < es.length; i++) {
+        var esize = es[i].querySelector(".size")
+        var edate = es[i].querySelector(".date")
+
+        if (es[i].className === "file")
+            esize.textContent = fileUnit(parseInt(esize.textContent))
+
+        else esize.textContent = ""
+
         var date = new Date(parseInt(edate.textContent) * 1000)
         var today = new Date()
         if ( date.getMinutes() === today.getMinutes()
@@ -391,8 +484,8 @@ function units() {
 
         } else if ( date.getMonth() === today.getMonth()
         &&          date.getFullYear() === today.getFullYear()) {
-            edate.textContent = date.getHours() + ":" + date.getMinutes()
-                              + " on the " + ordinal(date.getDate())
+            edate.textContent = ordinal(date.getDate()) + " at "
+                              + date.getHours() + ":" + date.getMinutes()
 
         } else if ( date.getFullYear() === today.getFullYear()) {
             edate.textContent = month(date.getMonth()) + " "
@@ -408,12 +501,85 @@ function units() {
     }
 }
 
+// fancyPrompt :: [File] -> Options -> IO ()
+function fancyPrompt(files, options) {
+    var d = document.createElement("div")
+    d.className = "shadow"
+    var w = document.createElement("div")
+    w.className = "popup"
+    var f = document.createElement("form")
+    var t = document.createElement("h3")
+    t.textContent = options.title
+    var b = document.createElement("input")
+    b.type = "submit"
+    b.value = "Submit"
+
+    if (! options.dynamic)
+        for (var i = 0; i < files.length; i++) {
+            var p = document.createElement("input")
+
+            if (options.placeholder) p.placeholder = options.placeholder
+            else p.placeholder = files[i].name
+            if (options.disabled) {
+                p.disabled = true
+                p.value = files[i].hash // FIXME FIXME
+
+            }
+
+            f.appendChild(p)
+        }
+
+    else {
+        var p = document.createElement("input")
+          , dynInp = function(_) {
+            if (this.value && !this.nextElementSibling.nextElementSibling) {
+                var e = document.createElement("input")
+                e.addEventListener("keyup", dynInp)
+                f.insertBefore(e, this.nextElementSibling)
+
+            } else if (!this.value && this.nextElementSibling.nextElementSibling)
+                f.removeChild(this.nextElementSibling)
+        }
+        p.addEventListener("keyup", dynInp)
+
+        f.appendChild(p)
+    }
+
+    d.addEventListener("click", function(e) {
+        this.parentNode.removeChild(this)
+    })
+    w.addEventListener("click", function(e) {
+        e.stopPropagation()
+    })
+    b.addEventListener("click", f)
+    f.addEventListener("submit", function(e) {
+        e.preventDefault()
+
+        var is = this.querySelectorAll("input:not([type])")
+
+        console.log(options)
+        for (var i = 0; i < is.length; i++) {
+            if (is[i].value) {
+                files[i]["newname"] = is[i].value
+                options.fun(files[i])
+            }
+        }
+    })
+
+    f.appendChild(b)
+    w.appendChild(t)
+    w.appendChild(f)
+    d.appendChild(w)
+    document.body.appendChild(d)
+}
+
 
 function main() {
     events()
-    units()
+    fixUnits()
 }
 
 main()
 
 console.log("Load time: " + ((new Date()).getTime() - lt)) //XXX ?
+

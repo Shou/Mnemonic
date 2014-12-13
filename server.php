@@ -18,11 +18,11 @@
 $fileTable = "CREATE TABLE IF NOT EXISTS Files
               ( fname TEXT, fuser TEXT, fpath TEXT, fhash TEXT, ftype TEXT
               , fsize INTEGER, fdate INTEGER
-              , UNIQUE (fname, fuser)
+              , UNIQUE (fname, fpath, fuser)
               );
               CREATE TABLE IF NOT EXISTS Paths
-              ( fpath TEXT, fuser TEXT, fsize INTEGER, fdate INTEGER
-              , UNIQUE (fpath, fuser)
+              ( fname TEXT, fpath TEXT, fuser TEXT, fsize INTEGER, fdate INTEGER
+              , UNIQUE (fname, fpath, fuser)
               );";
 
 $authTables = "CREATE TABLE IF NOT EXISTS Logins
@@ -111,6 +111,30 @@ function redirect($path) {
     exit();
 }
 
+// substrEq :: String -> String -> Bool
+function substrEq($str, $sub) {
+    return substr($str, 0, strlen($sub)) == $sub;
+}
+
+// init :: [a] -> [a]
+function init($xs) {
+    return array_slice($xs, 0, -1);
+}
+
+// pathEq :: String -> String -> Bool
+function pathEq($p0, $p1) {
+    $ps0 = array_filter(explode("/", $p0));
+    $ps1 = array_filter(explode("/", $p1));
+
+    $b = true;
+
+    if (count($ps0) != count($ps1)) $b = false;
+
+    else for ($i = 0; $i < count($ps0); $i++) $b = $b && $ps0[$i] == $ps1[$i];
+
+    return $b;
+}
+
 // }}}
 
 // storeFiles :: PDO -> IO ()
@@ -126,6 +150,7 @@ function storeFiles($fdb, $adb) {
     $user = cookieAuth($adb)["fuser"];
 
     $path = $_POST["path"];
+    if (! $path) $path = "/";
 
     // Check the total filesize, get file extension, generate SHA1 for file,
     // move file to "up" folder.
@@ -161,19 +186,18 @@ function storeFiles($fdb, $adb) {
             $moved = move_uploaded_file($tmps[$i], "../up/" . $filen) . "\n";
 
         if ($moved) echo $path . $filen . "\n";
-        //else echo "File move error.\n";
 
         $iquery = "INSERT INTO Files (fname, fuser, fpath, fhash, ftype, fsize, fdate)
-                   VALUES (:fname, :fuser, :fpath, :fhash, :ftype, :fsize, :fdate);";
+                   VALUES (:name, :user, :path, :hash, :type, :size, :date)";
         $stmt = $fdb -> prepare($iquery);
         var_dump($stmt);
-        $sqlargs = array( "fname" => $name
-                        , "fuser" => $user
-                        , "fpath" => $path
-                        , "fhash" => $hash
-                        , "ftype" => $extn
-                        , "fsize" => $size
-                        , "fdate" => $time
+        $sqlargs = array( "name" => $name
+                        , "user" => $user
+                        , "path" => $path
+                        , "hash" => $hash
+                        , "type" => $extn
+                        , "size" => $size
+                        , "date" => $time
                         );
         $res = $stmt -> execute($sqlargs);
         var_dump($res);
