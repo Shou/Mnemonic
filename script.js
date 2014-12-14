@@ -258,6 +258,13 @@ function month(n) {
            ][n]
 }
 
+// u jelly of my two-liner, stackoverflow?
+// pad :: Integer -> Integer -> String
+function pad(n, w) {
+    for (var zeroes = ""; w > zeroes.length; zeroes += "0");
+    return (n >= 0 ? "" : '-') + (zeroes + Math.abs(n)).slice(-w)
+}
+
 // }}}
 
 // | Upload a file to the server.
@@ -332,19 +339,28 @@ function logout() {
 
 // deleteFile :: Object String String -> IO ()
 function deleteFile(o) {
-    var o = { t: o.type, n: o.hash, p: o.path }
+    var f = o.type ? o.name : o.hash
+      , o = { t: o.type, n: f, p: o.path }
     submit("/delete/", o, function(x){ console.log(x) })
+}
+
+// renameFile :: Object String String -> IO ()
+function renameFile(o) {
+    var f = o.type ? o.name : o.hash
+      , o = { n: f, nf: o.newname, p: o.path, t: o.type }
+    submit("/move/", o, function(x){ console.log(x) })
 }
 
 // moveFile :: Object String String -> IO ()
 function moveFile(o) {
-    var o = { n: o.hash, nf: o.newname, p: o.path, t: o.type }
+    var f = o.type ? o.name : o.hash
+      , o = { n: f, nf: o.name, p: o.newname, t: o.type }
     submit("/move/", o, function(x){ console.log(x) })
 }
 
 // makePath :: Object String String -> IO ()
 function makePath(o) {
-    var o = { n: o.name, p: o.path }
+    var o = { n: o.newname, p: o.path }
     submit("/make/", o, function(x){ console.log(x) })
 }
 
@@ -354,8 +370,9 @@ function fileButt(e) {
     var o = ({ "delete": { fun: deleteFile
                          , title: "Confirm deletion"
                          , disabled: true
+                         , value: "name"
                          }
-             , "rename": { fun: moveFile
+             , "rename": { fun: renameFile
                          , title: "Rename file"
                          }
              , "move": { fun: moveFile
@@ -368,7 +385,7 @@ function fileButt(e) {
                        }
              })[this.name]
 
-      , sels = document.querySelectorAll("#files > div")
+      , sels = document.querySelectorAll("#files > label")
       , files = []
 
     for (var i = 0; i < sels.length; i++) {
@@ -437,7 +454,7 @@ function events() {
 
         // Paths events
         for (var i = 0; i < paths().length; i++)
-            paths()[i].children[2].addEventListener("click", pathTravel)
+            paths()[i].querySelector("a").addEventListener("click", pathTravel)
 
         // Files events
         for (var i = 0; i < fcbutts().length; i++)
@@ -454,6 +471,7 @@ function events() {
     }
 }
 
+// TODO get it on a slimming diet
 // | i'm sorry i wrote this monster
 // fixUnits :: IO ()
 function fixUnits() {
@@ -480,12 +498,14 @@ function fixUnits() {
         } else if ( date.getDate() === today.getDate()
         &&          date.getMonth() === today.getMonth()
         &&          date.getFullYear() === today.getFullYear()) {
-            edate.textContent = date.getHours() + ":" + date.getMinutes()
+            edate.textContent = pad(date.getHours(), 2) + ":"
+                              + pad(date.getMinutes(), 2)
 
         } else if ( date.getMonth() === today.getMonth()
         &&          date.getFullYear() === today.getFullYear()) {
             edate.textContent = ordinal(date.getDate()) + " at "
-                              + date.getHours() + ":" + date.getMinutes()
+                              + pad(date.getHours(), 2) + ":"
+                              + pad(date.getMinutes(), 2)
 
         } else if ( date.getFullYear() === today.getFullYear()) {
             edate.textContent = month(date.getMonth()) + " "
@@ -501,6 +521,7 @@ function fixUnits() {
     }
 }
 
+// | I NEVER FORESAW THIS MASSIVE MONSTER'S ARRIVAL
 // fancyPrompt :: [File] -> Options -> IO ()
 function fancyPrompt(files, options) {
     var d = document.createElement("div")
@@ -520,11 +541,8 @@ function fancyPrompt(files, options) {
 
             if (options.placeholder) p.placeholder = options.placeholder
             else p.placeholder = files[i].name
-            if (options.disabled) {
-                p.disabled = true
-                p.value = files[i].hash // FIXME FIXME
-
-            }
+            if (options.disabled) p.disabled = true
+            if (options.value) p.value = files[i][options.value]
 
             f.appendChild(p)
         }
@@ -548,17 +566,21 @@ function fancyPrompt(files, options) {
     d.addEventListener("click", function(e) {
         this.parentNode.removeChild(this)
     })
+    // don't close popup with clicks outside shade
     w.addEventListener("click", function(e) {
         e.stopPropagation()
     })
-    b.addEventListener("click", f)
     f.addEventListener("submit", function(e) {
         e.preventDefault()
 
-        var is = this.querySelectorAll("input:not([type])")
+        // do not want submit element
+        var is = this.querySelectorAll("input:not([type='submit'])")
 
-        console.log(options)
+        console.log(is)
         for (var i = 0; i < is.length; i++) {
+            // Dynamic inputs don't have checkboxed file metadata
+            if (options.dynamic) files[i] = { path: maybe("/", id, path) }
+
             if (is[i].value) {
                 files[i]["newname"] = is[i].value
                 options.fun(files[i])

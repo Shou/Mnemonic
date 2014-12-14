@@ -9,15 +9,15 @@ function poster($auth) {
     $args = safeArgs($_POST, ["n", "nf", "p"]);
 
     if ($args) {
-        $user = $auth["fuser"];
-
         $fdb = opendb("../files.db", $fileTable);
 
+        $user = $auth["fuser"];
         $sqlargs = array( "user" => $user );
 
         if (! $args["t"]) {
-            $sqlargs["name"] = $args["n"];
-            $sqlargs["hash"] = $args["nf"];
+            $sqlargs["name"] = $args["nf"];
+            $sqlargs["hash"] = $args["n"];
+            $sqlargs["path"] = $args["p"];
 
             $isql = "UPDATE Files
                      SET fname=:name, fpath=:path
@@ -33,9 +33,9 @@ function poster($auth) {
         }
 
         $stmt = $fdb -> prepare($isql);
-
+        var_dump($stmt);
+        var_dump($sqlargs);
         $res = $stmt -> execute($sqlargs);
-
         var_dump($res);
 
         echo 0;

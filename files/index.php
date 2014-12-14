@@ -28,13 +28,17 @@ for ($i = 0; $i < count($paths); $i++) {
 
     if (pathEq($fpath, $cpath))
         array_push($pathDivs, "
-            <div class=fldr>
-                <span class=chck><input type=checkbox></span>
-                <img class=thmb src=/icons/folder.png>
-                <a href=javascript:;>$fname</a>
+            <label class=fldr>
+                <input class=chck type=checkbox>
+                <span class=thmb>
+                    <img style=background-image:url(/icons/folder.png)>
+                </span>
+                <span class=link>
+                    <a href=javascript:;>$fname</a>
+                </span>
                 <span class=size>$fsize</span>
                 <span class=date>$fdate</span>
-            </div>\n");
+            </label>\n");
 }
 
 for ($i = 0; $i < count($files); $i++) {
@@ -45,15 +49,24 @@ for ($i = 0; $i < count($files); $i++) {
     $fdate = $files[$i]["fdate"];
     $fpath = $files[$i]["fpath"];
 
+    if (preg_match("/jpe?g|png|gif/", $ftype))
+        $img = "/up/$fhash";
+    else
+        $img = "/icons/empty.png";
+
     if (pathEq($fpath, $cpath))
         array_push($fileDivs, "
-            <div class=file>
-                <span class=chck><input type=checkbox></span>
-                <img class=thmb src=/up/$fhash>
-                <a href=/up/$fhash download=\"$fname\">$fname</a>
+            <label class=file>
+                <input class=chck type=checkbox>
+                <span class=thmb>
+                    <img style=background-image:url($img)>
+                </span>
+                <span class=link>
+                    <a href=/up/$fhash download=\"$fname\">$fname</a>
+                </span>
                 <span class=size>$fsize</span>
                 <span class=date>$fdate</span>
-            </div>\n");
+            </label>\n");
 
     $totalSize += $fsize;
 }

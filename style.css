@@ -95,20 +95,12 @@ Author: Benedict Aas (M00466699)
 
 /* Background image accommodated to the screen */
 @media (orientation: portrait), (max-width: 1100px) {
-    body
-    { background-size: auto 100%
-    }
-
     main, main > div
     { width: 100%
     }
 }
 
 @media (orientation: landscape) and (min-width: 1100px) {
-    body
-    { background-size: 100% auto
-    }
-
     main, main > div
     { width: 66vw
     }
@@ -125,6 +117,7 @@ body
 { font-family: "Open Sans", sans-serif
 ; background-color: #9ccc65
 ; background-position: center center
+; background-size: cover
 ; padding: 0
 ; margin: 0
 ; border: 0
@@ -221,7 +214,15 @@ input[type="file"]
 { display: none
 }
 
-label
+input:checked, input:checked ~ *
+{ background-color: #b3e5fc
+}
+
+input[type="checkbox"]
+{ display: none !important
+}
+
+label[for="upload"]
 { font-family: "Open Sans", sans-serif
 ; font-weight: 800
 ; color: #f7f7f7
@@ -231,7 +232,7 @@ label
 ; cursor: pointer
 }
 
-label:hover
+label[for="upload"]:hover
 { background-color: #00796b
 ; border-color: #673E1F
 ; transition: 1s background-color, 1s border-color
@@ -371,36 +372,47 @@ form
 ; text-overflow: ellipsis
 }
 
-#files > div
+#files > label
 { display: table-row
 ; height: 5em
 }
 
-#files > div:nth-child(odd)
+#files > label:nth-child(odd)
 { background-color: #EEE
 }
 
-#files > div:hover, #files > div:focus
+#files > label:hover, #files > label:focus
 { background-color: #b3e5fc
 }
 
-#files > div > *
+#files > label > *
 { display: table-cell
 ; vertical-align: middle
 ; margin: 1em
 }
 
-#files > div > *:first-child
+#files > label > *:first-child
 { padding-left: 1em
 }
 
-#files > div > *:last-child
+#files > label > *:last-child
 { padding-right: 1em
 }
 
-img.thmb
-{ max-width: 3em
-; max-height: 3em
+span.thmb
+{ padding: 0 1em
+; width: 3em
+}
+
+span.thmb img
+{ width: 3em
+; height: 3em
+; background-repeat: no-repeat
+; background-size: cover
+; background-position: center
+; display: block
+; border-radius: 0.2em
+; border: none
 }
 
 header > nav

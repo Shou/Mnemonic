@@ -188,16 +188,16 @@ function storeFiles($fdb, $adb) {
         if ($moved) echo $path . $filen . "\n";
 
         $iquery = "INSERT INTO Files (fname, fuser, fpath, fhash, ftype, fsize, fdate)
-                   VALUES (:name, :user, :path, :hash, :type, :size, :date)";
+                   VALUES (:fname, :fuser, :fpath, :fhash, :ftype, :fsize, :fdate);";
         $stmt = $fdb -> prepare($iquery);
         var_dump($stmt);
-        $sqlargs = array( "name" => $name
-                        , "user" => $user
-                        , "path" => $path
-                        , "hash" => $hash
-                        , "type" => $extn
-                        , "size" => $size
-                        , "date" => $time
+        $sqlargs = array( "fname" => $name
+                        , "fuser" => $user
+                        , "fpath" => $path
+                        , "fhash" => $hash
+                        , "ftype" => $extn
+                        , "fsize" => $size
+                        , "fdate" => $time
                         );
         $res = $stmt -> execute($sqlargs);
         var_dump($res);
