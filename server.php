@@ -16,7 +16,7 @@
 // {{{ Consts
 
 $fileTable = "CREATE TABLE IF NOT EXISTS Files
-              ( fname TEXT, fuser TEXT, fpath TEXT, fhash TEXT, ftype TEXT
+              ( fname TEXT, fuser TEXT, fpath INT, fhash TEXT, ftype TEXT
               , fsize INTEGER, fdate INTEGER
               , UNIQUE (fname, fpath, fuser)
               );
@@ -122,17 +122,19 @@ function init($xs) {
 }
 
 // pathEq :: String -> String -> Bool
-function pathEq($p0, $p1) {
-    $ps0 = array_filter(explode("/", $p0));
-    $ps1 = array_filter(explode("/", $p1));
+function pathEq($p0, $p1, $fdb) {
+    $isql = "SELECT rowid, * FROM Paths
+             WHERE rowid=:path";
+    $stmt = $fdb -> prepare($isql);
+    var_dump($stmt);
+    $res = $stmt -> execute(array( "path" => $p0));
+    var_dump($res);
+    $dat = $stmt -> fetchAll();
+    var_dump($dat);
 
-    $b = true;
-
-    if (count($ps0) != count($ps1)) $b = false;
-
-    else for ($i = 0; $i < count($ps0); $i++) $b = $b && $ps0[$i] == $ps1[$i];
-
-    return $b;
+    echo $dat[0]["fname"];
+    if ($dat[0]["fname"] == $p1) return true;
+    else return false;
 }
 
 // }}}
@@ -150,7 +152,6 @@ function storeFiles($fdb, $adb) {
     $user = cookieAuth($adb)["fuser"];
 
     $path = $_POST["path"];
-    if (! $path) $path = "/";
 
     // Check the total filesize, get file extension, generate SHA1 for file,
     // move file to "up" folder.
@@ -187,6 +188,28 @@ function storeFiles($fdb, $adb) {
 
         if ($moved) echo $path . $filen . "\n";
 
+        if ($path) {
+            $isql = "SELECT rowid, * FROM Paths
+                     WHERE fname=:path";
+            $stmt = $fdb -> prepare($isql);
+            var_dump($stmt);
+            $res = $stmt -> execute(array( "path" => $path));
+            var_dump($res);
+            $dat = $stmt -> fetchAll();
+            var_dump($dat);
+
+            if (count($dat))
+                $path = $dat[0]["rowid"];
+
+            else {
+                echo "Path doesn't exist.\n1";
+                exit(); // disgustingly impure
+            }
+
+        } else $path = "0";
+
+        var_dump($path);
+
         $iquery = "INSERT INTO Files (fname, fuser, fpath, fhash, ftype, fsize, fdate)
                    VALUES (:fname, :fuser, :fpath, :fhash, :ftype, :fsize, :fdate);";
         $stmt = $fdb -> prepare($iquery);
@@ -201,13 +224,6 @@ function storeFiles($fdb, $adb) {
                         );
         $res = $stmt -> execute($sqlargs);
         var_dump($res);
-
-        $stmt = $fdb -> prepare("SELECT * FROM Files");
-        var_dump($stmt);
-        $res = $stmt -> execute();
-        var_dump($res);
-        $dat = $stmt -> fetchAll();
-        var_dump($dat);
     }
 }
 
@@ -275,7 +291,7 @@ function register($db, $user, $pass) {
 
 // selectFile :: String -> PDO -> PDO -> IO [Object String String]
 function selectFile($ft, $fdb, $user) {
-    $isql = "SELECT * FROM $ft
+    $isql = "SELECT rowid, * FROM $ft
              WHERE fuser=:fuser";
     $sel = $fdb -> prepare($isql);
 

@@ -115,7 +115,7 @@ Author: Benedict Aas (M00466699)
 
 body
 { font-family: "Open Sans", sans-serif
-; background-color: #9ccc65
+; background-color: #689f38
 ; background-position: center center
 ; background-size: cover
 ; padding: 0
@@ -137,7 +137,6 @@ header
 ; justify-content: space-between
 ; background-color: #f5f5f5
 ; padding: 0.5em 0.5em 0 0.5em
-; border-bottom: 0.3em solid #EEE
 }
 
 header > a
@@ -148,6 +147,14 @@ header > a
 
 h1, header > a, form h1
 { font-size: 2em
+}
+
+header, main
+{ box-shadow: 1px 0.1em 0 0.1em #558b2f
+}
+
+#front > main
+{ box-shadow: none
 }
 
 form, form input, label
@@ -192,6 +199,16 @@ main > div
 ; border-radius: 1px
 }
 
+nav, div.control
+{ display: flex
+; flex-direction: row
+}
+
+div.control
+{ justify-content: space-around
+; width: 100%
+}
+
 footer
 { font-family: "Open Sans", sans-serif
 ; font-weight: 300
@@ -227,7 +244,7 @@ label[for="upload"]
 ; font-weight: 800
 ; color: #f7f7f7
 ; padding: 0.6em
-; margin: 1vw 1vw -0.25em 0
+; margin: 1vw 1vw 0 0
 ; background-color: #03a9f4
 ; cursor: pointer
 }
@@ -251,8 +268,12 @@ form[name="auth"]
 input
 { margin: 0.25em
 ; padding: 0.25em 0.5em
-; border-width: 1px
-; border-style: solid
+; border: none
+; border-bottom: 0.3em solid
+}
+
+#front input
+{ border-width: 0.1em
 }
 
 form input[type="submit"], form input[type="button"]
@@ -298,6 +319,7 @@ input[type="button"]
 
 input[type="button"]:hover
 { background-color: #F5F5F5
+; border-color: #424242
 }
 
 form input[type="submit"]

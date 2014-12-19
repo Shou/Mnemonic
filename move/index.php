@@ -24,8 +24,8 @@ function poster($auth) {
                      WHERE fhash=:hash AND fuser=:user";
 
         } else {
-            $sqlargs["oldpath"] = $pargs["n"];
-            $sqlargs["newpath"] = $pargs["nf"];
+            $sqlargs["oldpath"] = $args["n"];
+            $sqlargs["newpath"] = $args["nf"];
 
             $isql = "UPDATE Paths
                      SET fname=:newpath

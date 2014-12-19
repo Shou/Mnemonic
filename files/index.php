@@ -26,7 +26,7 @@ for ($i = 0; $i < count($paths); $i++) {
     $fsize = $paths[$i]["fsize"];
     $fdate = $paths[$i]["fdate"];
 
-    if (pathEq($fpath, $cpath))
+    if (pathEq($fpath, $cpath, $fdb))
         array_push($pathDivs, "
             <label class=fldr>
                 <input class=chck type=checkbox>
@@ -54,7 +54,7 @@ for ($i = 0; $i < count($files); $i++) {
     else
         $img = "/icons/empty.png";
 
-    if (pathEq($fpath, $cpath))
+    if (pathEq($fpath, $cpath, $fdb))
         array_push($fileDivs, "
             <label class=file>
                 <input class=chck type=checkbox>
@@ -75,19 +75,35 @@ $total = ceil($totalSize / pow(1024, 3) * 100);
 
 ?>
 
-<?php require("../top.html"); ?>
+<!DOCTYPE html>
+
+<head>
+
+<title>Mnemonic</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+<link rel="stylesheet" type="text/css" href="/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<a href="/">Mnemonic</a>
+
+<label for="upload">Upload</label>
+<input type="file" name="files[]" id="upload" multiple>
+
+</header>
 
 <main>
 
 <div>
 
-<div>
-
-<nav>
-
-Mnemonic
-
-</nav>
+<div class=control>
 
 <div id=control>
 
@@ -110,6 +126,20 @@ Mnemonic
 
 </div>
 
+<nav>
+
+<?php
+
+$cpaths = explode("/", $cpath);
+
+echo "<a href=./>Files</a> ";
+for ($i = 0; $i < count($cpaths); $i++) if ($cpaths[$i])
+    echo "&#x2192; <a href=?path=" . $cpaths[$i] . ">" . $cpaths[$i] . "</a>";
+
+?>
+
+</nav>
+
 <div id=files>
 
 <?php
@@ -121,6 +151,9 @@ for ($i = 0; $i < count($pathDivs); $i++) {
 for ($i = 0; $i < count($fileDivs); $i++) {
     echo $fileDivs[$i];
 }
+
+if (! $fileDivs && ! $pathDivs)
+    echo "This folder is empty.";
 
 ?>
 

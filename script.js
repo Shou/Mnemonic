@@ -1,8 +1,6 @@
 
 // JQuery? Convenience? What's what?
 
-var lt = (new Date()).getTime()
-
 // {{{ Constants
 
 var max_file_size = Math.pow(1024, 2) * 10
@@ -389,16 +387,20 @@ function fileButt(e) {
       , files = []
 
     for (var i = 0; i < sels.length; i++) {
-        var chkd = sels[i].querySelector("[type='checkbox']").checked
-          , hash = sels[i].querySelector("a").pathname.replace("/up/", "")
-          , name = sels[i].querySelector("a").textContent
-          , isPath = sels[i].className === "fldr"
+        var sel = sels[i]
+          , chkd = sel.querySelector("[type='checkbox']").checked
+          , a = sel.querySelector("a")
+          , hash = a.pathname.replace("/up/", "")
+          , name = a.textContent
+          , iden = a.id
+          , isPath = sel.className === "fldr"
 
         if (chkd) {
             files.push({ type: isPath
                        , hash: hash
                        , name: name
                        , path: maybe("/", id, path)
+                       , iden: iden
                        })
         }
     }
@@ -602,6 +604,4 @@ function main() {
 }
 
 main()
-
-console.log("Load time: " + ((new Date()).getTime() - lt)) //XXX ?
 
