@@ -358,7 +358,7 @@ function moveFile(o) {
 
 // makePath :: Object String String -> IO ()
 function makePath(o) {
-    var o = { n: o.newname, p: o.path }
+    var o = { n: o.path + o.newname }
     submit("/make/", o, function(x){ console.log(x) })
 }
 
@@ -581,7 +581,8 @@ function fancyPrompt(files, options) {
         console.log(is)
         for (var i = 0; i < is.length; i++) {
             // Dynamic inputs don't have checkboxed file metadata
-            if (options.dynamic) files[i] = { path: maybe("/", id, path) }
+            if (options.dynamic)
+                files[i] = { path: maybe("/", flip(add)('/'), path) }
 
             if (is[i].value) {
                 files[i]["newname"] = is[i].value

@@ -21,8 +21,8 @@ $fileTable = "CREATE TABLE IF NOT EXISTS Files
               , UNIQUE (fname, fpath, fuser)
               );
               CREATE TABLE IF NOT EXISTS Paths
-              ( fname TEXT, fpath TEXT, fuser TEXT, fsize INTEGER, fdate INTEGER
-              , UNIQUE (fname, fpath, fuser)
+              ( fpath TEXT, fuser TEXT, fsize INTEGER, fdate INTEGER
+              , UNIQUE (fpath, fuser)
               );";
 
 $authTables = "CREATE TABLE IF NOT EXISTS Logins
@@ -122,19 +122,16 @@ function init($xs) {
 }
 
 // pathEq :: String -> String -> Bool
-function pathEq($p0, $p1, $fdb) {
-    $isql = "SELECT rowid, * FROM Paths
-             WHERE rowid=:path";
-    $stmt = $fdb -> prepare($isql);
-    var_dump($stmt);
-    $res = $stmt -> execute(array( "path" => $p0));
-    var_dump($res);
-    $dat = $stmt -> fetchAll();
-    var_dump($dat);
+function pathEq($p0, $p1) {
+    $ps0 = array_filter(explode("/", $p0));
+    $ps1 = array_filter(explode("/", $p1));
 
-    echo $dat[0]["fname"];
-    if ($dat[0]["fname"] == $p1) return true;
-    else return false;
+    $b = true;
+
+    if (count($ps0) != count($ps1)) $b = false;
+    else for ($i = 0; $i < count($ps0); $i++) $b = $b && $ps0[$i] == $ps1[$i];
+
+    return $b;
 }
 
 // }}}

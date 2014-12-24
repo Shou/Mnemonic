@@ -21,12 +21,13 @@ $fileDivs = [];
 $totalSize = 0;
 
 for ($i = 0; $i < count($paths); $i++) {
-    $fname = $paths[$i]["fname"];
     $fpath = $paths[$i]["fpath"];
     $fsize = $paths[$i]["fsize"];
     $fdate = $paths[$i]["fdate"];
+    $fname = end(explode("/", $fpath));
+    $fpath = implode("/", array_slice(explode("/", $fpath), 0, -1));
 
-    if (pathEq($fpath, $cpath, $fdb))
+    if (pathEq($fpath, $cpath))
         array_push($pathDivs, "
             <label class=fldr>
                 <input class=chck type=checkbox>
@@ -54,7 +55,7 @@ for ($i = 0; $i < count($files); $i++) {
     else
         $img = "/icons/empty.png";
 
-    if (pathEq($fpath, $cpath, $fdb))
+    if (pathEq($fpath, $cpath))
         array_push($fileDivs, "
             <label class=file>
                 <input class=chck type=checkbox>

@@ -5,18 +5,16 @@ require("../server.php");
 
 
 function poster($auth) {
-    $args = safeArgs($_POST, ["n", "p"]);
+    $args = safeArgs($_POST, ["n"]);
 
     if ($args) {
         $fdb = opendb("../files.db", $fileTable);
 
-        // TODO reject files instead
-        $name = str_replace("/", "", $args["n"]);
+        $path = implode("/", array_filter(explode("/", $args["n"])));
 
-        $isql = "INSERT INTO Paths (fname, fpath, fuser, fsize, fdate)
-                 VALUES (:name, :path, :user, :size, :date);";
-        $sqlargs = array( "path" => $args["p"]
-                        , "name" => $name
+        $isql = "INSERT INTO Paths (fpath, fuser, fsize, fdate)
+                 VALUES (:path, :user, :size, :date);";
+        $sqlargs = array( "path" => $path
                         , "user" => $auth["fuser"]
                         , "size" => 0
                         , "date" => time()
@@ -27,7 +25,7 @@ function poster($auth) {
 
         var_dump($res);
 
-    } else echo "1";
+    } else echo 1;
 
     exit();
 }
